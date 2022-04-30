@@ -13,41 +13,77 @@ import (
 )
 
 func solve(c *cli.Context) error {
-	if c.Args().Len() < 1 {
-		log.Fatal("Not enough arguments!")
+	var argc int = c.Args().Len()
+
+	if argc < 1 {
+		log.Fatal("Not enough arguments")
 	}
 
-	mixSequence := c.Args().Get(0)
+	var notationMatrix map[string]func(*cube.Cube, bool, bool) = make(map[string]func(*cube.Cube, bool, bool))
 
-	for _, move := range strings.Split(mixSequence, " ") {
-		fmt.Println("Move:", move)
-	}
+	notationMatrix["F"] = cube.Front
+	notationMatrix["R"] = cube.Right
+	notationMatrix["L"] = cube.Left
+	notationMatrix["B"] = cube.Back
+	notationMatrix["U"] = cube.Up
+	notationMatrix["D"] = cube.Down
+
+	notationMatrix["F'"] = cube.RFront
+	notationMatrix["R'"] = cube.RRight
+	notationMatrix["L'"] = cube.RLeft
+	notationMatrix["B'"] = cube.RBack
+	notationMatrix["U'"] = cube.RUp
+	notationMatrix["D'"] = cube.RDown
+
+	notationMatrix["F2"] = cube.DFront
+	notationMatrix["R2"] = cube.DRight
+	notationMatrix["L2"] = cube.DLeft
+	notationMatrix["B2"] = cube.DBack
+	notationMatrix["U2"] = cube.DUp
+	notationMatrix["D2"] = cube.DDown
+
+	notationMatrix["F2'"] = cube.RDFront
+	notationMatrix["R2'"] = cube.RDRight
+	notationMatrix["L2'"] = cube.RDLeft
+	notationMatrix["B2'"] = cube.RDBack
+	notationMatrix["U2'"] = cube.RDUp
+	notationMatrix["D2'"] = cube.RDDown
 
 	cu := cube.Create()
 
-	cube.Print(cu)
-
-	fmt.Printf("\n\n\n")
+	mixSequenceString := c.Args().Get(0)
 
 	start := time.Now()
 
-	for i := 0; i < 1000000000; i++ {
-		cube.Front(cu, true, true)
+	for _, move := range strings.Split(mixSequenceString, " ") {
+		if value, ok := notationMatrix[strings.ToUpper(move)]; ok {
+			value(cu, false, false)
+		} else {
+			log.Fatalf("Unsupported move: %s", move)
+		}
 	}
 
 	elapsed := time.Since(start)
 
-	cube.Print(cu)
-
-	fmt.Printf("Time to make move: %s\n", elapsed)
+	if c.Bool("v") {
+		fmt.Printf("Mixing cube took %s\n", elapsed)
+		cube.Print(cu)
+	}
 
 	return nil
 }
 
 func main() {
 	app := &cli.App{
-		Name:   "Rubik",
-		Usage:  "Rubik's cube solver",
+		Name:  "Rubik",
+		Usage: "Rubik's cube solver",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "v",
+				Value: false,
+				Usage: "Show debug output",
+			},
+		},
 		Action: solve,
 	}
 

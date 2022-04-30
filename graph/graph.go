@@ -1,12 +1,15 @@
 package graph
 
+import (
+	"github.com/AloySobek/Rubik/cube"
+)
+
 type Data struct {
-	Name string
-	Age  int
+	Cube *cube.Cube
 }
 
 type Meta struct {
-	Length int
+	HeuristicValue int64
 }
 
 type Edge struct {
@@ -19,11 +22,18 @@ type Node struct {
 	Edges []*Edge
 }
 
-func Connect(root *Node, child *Node, meta *Meta) *Node {
-	root.Edges = append(root.Edges, &Edge{
+func CreateNode(data *Data) *Node {
+	return &Node{
+		Data:  data,
+		Edges: make([]*Edge, 0),
+	}
+}
+
+func Connect(a *Node, b *Node, meta *Meta) *Node {
+	a.Edges = append(a.Edges, &Edge{
 		Meta: meta,
-		Node: child,
+		Node: b,
 	})
 
-	return root
+	return a
 }
