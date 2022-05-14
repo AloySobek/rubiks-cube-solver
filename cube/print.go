@@ -3,50 +3,93 @@ package cube
 import "fmt"
 
 func Print(cube *Cube) {
-	fmt.Println("Blue side:")
-	printSide(cube.Blue, "B")
-	fmt.Printf("\n\n")
+	buffer := make([][]rune, 15)
 
-	fmt.Println("Red side:")
-	printSide(cube.Red, "R")
-	fmt.Printf("\n\n")
+	for i := 0; i < 15; i += 1 {
+		buffer[i] = make([]rune, 11)
+	}
 
-	fmt.Println("Orange side:")
-	printSide(cube.Orange, "O")
-	fmt.Printf("\n\n")
+	putSide(buffer, cube.Blue, 'B', 8, 4)
+	putSide(buffer, cube.Red, 'R', 8, 8)
+	putSide(buffer, cube.Orange, 'O', 8, 0)
+	putSide(buffer, cube.Green, 'G', 0, 4)
+	putSide(buffer, cube.Yellow, 'Y', 4, 4)
+	putSide(buffer, cube.White, 'W', 12, 4)
 
-	fmt.Println("Green side:")
-	printSide(cube.Green, "G")
-	fmt.Printf("\n\n")
-
-	fmt.Println("Yellow side:")
-	printSide(cube.Yellow, "Y")
-	fmt.Printf("\n\n")
-
-	fmt.Println("White side:")
-	printSide(cube.White, "W")
-	fmt.Printf("\n\n")
+	render(buffer)
 }
 
-func printSide(side uint64, name string) {
-	for i := 0; i < 8; i += 1 {
-		switch (side & (uint64(0xFF) << (8 * i))) >> (8 * i) {
-		case Blue:
-			fmt.Printf("B ")
-		case Red:
-			fmt.Printf("R ")
-		case Orange:
-			fmt.Printf("O ")
-		case Green:
-			fmt.Printf("G ")
-		case Yellow:
-			fmt.Printf("Y ")
-		case White:
-			fmt.Printf("W ")
+func render(buffer [][]rune) {
+	for y := 0; y < 15; y += 1 {
+		for x := 0; x < 11; x += 1 {
+			switch buffer[y][x] {
+			case 'B':
+				fmt.Printf("🟦")
+			case 'R':
+				fmt.Printf("🟥")
+			case 'O':
+				fmt.Printf("🟧")
+			case 'G':
+				fmt.Printf("🟩")
+			case 'Y':
+				fmt.Printf("🟨")
+			case 'W':
+				fmt.Printf("⬜")
+			default:
+				fmt.Printf("⬛")
+			}
 		}
+		fmt.Println()
+	}
+}
 
-		if i == 3 {
-			fmt.Printf("%s ", name)
-		}
+func putSide(buffer [][]rune, side uint64, color rune, iy, ix int) {
+	y := iy
+	x := ix
+	i := 0
+
+	for ; x != ix+3; x, i = x+1, i+1 {
+		buffer[y][x] = getSideCubieColor(side, i)
+	}
+
+	x, y = x-1, y+1
+
+	for ; y != iy+3; y, i = y+1, i+1 {
+		buffer[y][x] = getSideCubieColor(side, i)
+	}
+
+	y, x = y-1, x-1
+
+	for ; x != ix-1; x, i = x-1, i+1 {
+		buffer[y][x] = getSideCubieColor(side, i)
+	}
+
+	x, y = x+1, y-1
+
+	for ; y != iy; y, i = y-1, i+1 {
+		buffer[y][x] = getSideCubieColor(side, i)
+	}
+
+	y, x = y+1, x+1
+
+	buffer[y][x] = color
+}
+
+func getSideCubieColor(side uint64, position int) rune {
+	switch (side & (uint64(0xFF) << (8 * position))) >> (8 * position) {
+	case Blue:
+		return 'B'
+	case Red:
+		return 'R'
+	case Orange:
+		return 'O'
+	case Green:
+		return 'G'
+	case Yellow:
+		return 'Y'
+	case White:
+		return 'W'
+	default:
+		return ' '
 	}
 }

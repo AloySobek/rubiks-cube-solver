@@ -95,27 +95,3 @@ func DUp(cube *Cube, _, _ bool) {
 func DDown(cube *Cube, _, _ bool) {
 	Down(cube, false, true)
 }
-
-func RDFront(cube *Cube, _, _ bool) {
-	Front(cube, true, true)
-}
-
-func RDRight(cube *Cube, _, _ bool) {
-	Right(cube, true, true)
-}
-
-func RDLeft(cube *Cube, _, _ bool) {
-	Left(cube, true, true)
-}
-
-func RDBack(cube *Cube, _, _ bool) {
-	Back(cube, true, true)
-}
-
-func RDUp(cube *Cube, _, _ bool) {
-	Up(cube, true, true)
-}
-
-func RDDown(cube *Cube, _, _ bool) {
-	Down(cube, true, true)
-}
