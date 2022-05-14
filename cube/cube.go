@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Cubie color code
 const (
 	Yellow = 1
 	Orange = 2
@@ -16,6 +17,7 @@ const (
 	Red    = 32
 )
 
+// Cube itself
 type Cube struct {
 	Yellow uint64 // Up side
 	Orange uint64 // Left side
@@ -30,6 +32,7 @@ var PossibleMoves []string = []string{
 	"F'", "R'", "L'", "B'", "U'", "D'",
 	"F2", "R2", "L2", "B2", "U2", "D2",
 }
+
 var NotationMatrix map[string]func(*Cube, bool, bool) = map[string]func(*Cube, bool, bool){
 	"F": Front, "R": Right, "L": Left, "B": Back, "U": Up, "D": Down,
 	"F'": RFront, "R'": RRight, "L'": RLeft, "B'": RBack, "U'": RUp, "D'": RDown,
@@ -61,8 +64,8 @@ func GetRandomMixSequence() (sequence string) {
 	return
 }
 
-func Mix(cube *Cube, sequence string) *Cube {
-	for _, move := range strings.Split(sequence, " ") {
+func Mix(cube *Cube, sequence []string) *Cube {
+	for _, move := range sequence {
 		if function, ok := NotationMatrix[strings.ToUpper(move)]; ok {
 			function(cube, false, false)
 		} else {
