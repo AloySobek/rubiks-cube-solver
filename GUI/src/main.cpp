@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     glfwSetErrorCallback(errorCallback);
 
-    GLFWwindow *window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(640, 480, "RubikGUI", NULL, NULL);
     if (!window)
     {
         std::cout << "Can't create GLFW Window, exiting..." << std::endl;
