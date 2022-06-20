@@ -7,7 +7,3 @@ import (
 func Solve(cube *cube.Cube) (string, *cube.Cube) {
 	return "", cube
 }
-
-func IDAStar() {
-
-}

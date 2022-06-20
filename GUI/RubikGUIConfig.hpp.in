@@ -1,4 +1,0 @@
-#define RubikGUI_VERSION_MAJOR \
-    $ { RubikGUI_VERSION_MAJOR }
-#define RubikGUI_VERSION_MINOR \
-    $ { RubikGUI_VERSION_MINOR }

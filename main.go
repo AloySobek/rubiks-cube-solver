@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -10,7 +13,6 @@ import (
 
 	"github.com/AloySobek/Rubik/algorithm"
 	"github.com/AloySobek/Rubik/cube"
-	"github.com/AloySobek/Rubik/graph"
 )
 
 func app(ctx *cli.Context) error {
@@ -22,101 +24,50 @@ func app(ctx *cli.Context) error {
 		sequence = regexp.MustCompile("\\s+").ReplaceAllString(sequence, " ")
 	}
 
-	fmt.Println("Initial mix sequence:", sequence)
-	fmt.Println()
+	fmt.Printf("Initial mix sequence: %s\n\n", sequence)
 
-	c := cube.Mix(cube.Create(), strings.Split(sequence, " "))
+	c := cube.ApplyMoves(cube.Create(), strings.Split(sequence, " "), nil)
 
-	fmt.Println("Mixed cube before solving:")
-	fmt.Println()
+	fmt.Printf("Mixed cube:\n\n")
 	cube.Print(c)
-	fmt.Println()
 
 	start := time.Now()
 	solution, c := algorithm.Solve(c)
 	elapsed := time.Since(start)
 
-	fmt.Println("Solved cube:")
-	fmt.Println()
-	cube.Print(c)
-	fmt.Println()
+	fmt.Printf("\nSolution sequence: %s\n\n", solution)
+	fmt.Printf("Solution time: %d\n\n", elapsed)
 
-	fmt.Println("Solution sequence:", solution)
-	fmt.Println()
-	fmt.Println("Algorithm time:", elapsed)
+	fmt.Printf("Would you like to see cube is solved move by move? (y/n)\n")
+
+	reader := bufio.NewReader(os.Stdin)
+
+	if text, error := reader.ReadString('\n'); error != nil {
+		return error
+	} else if strings.Replace(text, "\n", "", -1) == "y" {
+		cube.ApplyMoves(c, strings.Split(strings.TrimSpace(solution), " "), nil)
+	}
 
 	return nil
 }
 
 func main() {
-	// app := &cli.App{
-	// 	Name:  "Rubik",
-	// 	Usage: "Rubik's cube solver",
-	// 	Flags: []cli.Flag{
-	// 		&cli.StringFlag{
-	// 			Name:  "s",
-	// 			Value: "random",
-	// 			Usage: "Space separated sequence of moves to mix the cube",
-	// 		},
-	// 	},
-	// 	Action: app,
-	// }
-
-	// err := app.Run(os.Args)
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-	// 	panic(err)
-	// }
-	// defer sdl.Quit()
-
-	// window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-	// 	800, 600, sdl.WINDOW_SHOWN)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer window.Destroy()
-
-	// surface, err := window.GetSurface()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// surface.FillRect(nil, 0)
-
-	// rect := sdl.Rect{0, 0, 200, 200}
-	// surface.FillRect(&rect, 0xffff0000)
-	// window.UpdateSurface()
-
-	// running := true
-	// for running {
-	// 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-	// 		switch event.(type) {
-	// 		case *sdl.QuitEvent:
-	// 			println("Quit")
-	// 			running = false
-	// 			break
-	// 		}
-	// 	}
-	// }
-
-	origin := graph.PremadeGraphOne()
-
-	goal := algorithm.Dijkstra(origin)
-
-	if goal == nil {
-		fmt.Println("Fuck! Didn't found goal node")
-	} else {
-		fmt.Println(goal.Data.Path)
+	app := &cli.App{
+		Name:  "Rubik",
+		Usage: "Rubik's cube solver",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "s",
+				Value: "random",
+				Usage: "Space separated sequence of moves to mix the cube",
+			},
+		},
+		Action: app,
 	}
 
-	for goal.Data.Label != graph.ORIGIN {
-		fmt.Println(goal.Data.Distance)
+	err := app.Run(os.Args)
 
-		goal = goal.Data.Path
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	// graph.Print(goal)
 }

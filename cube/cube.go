@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+type Cube struct {
+	Yellow uint64 // Up side
+	Orange uint64 // Left side
+	Green  uint64 // Back side
+	White  uint64 // Down side
+	Blue   uint64 // Front side
+	Red    uint64 // Right side
+}
+
 // Cubie color code
 const (
 	Yellow = 1
@@ -17,15 +26,14 @@ const (
 	Red    = 32
 )
 
-// Cube itself
-type Cube struct {
-	Yellow uint64 // Up side
-	Orange uint64 // Left side
-	Green  uint64 // Back side
-	White  uint64 // Down side
-	Blue   uint64 // Front side
-	Red    uint64 // Right side
-}
+const (
+	SolvedYellow = uint64(0) | Yellow | (Yellow << 8) | (Yellow << 16) | (Yellow << 24) | (Yellow << 32) | (Yellow << 40) | (Yellow << 48) | (Yellow << 56)
+	SolvedOrange = uint64(0) | Orange | (Orange << 8) | (Orange << 16) | (Orange << 24) | (Orange << 32) | (Orange << 40) | (Orange << 48) | (Orange << 56)
+	SolvedGreen  = uint64(0) | Green | (Green << 8) | (Green << 16) | (Green << 24) | (Green << 32) | (Green << 40) | (Green << 48) | (Green << 56)
+	SolvedWhite  = uint64(0) | White | (White << 8) | (White << 16) | (White << 24) | (White << 32) | (White << 40) | (White << 48) | (White << 56)
+	SolvedBlue   = uint64(0) | Blue | (Blue << 8) | (Blue << 16) | (Blue << 24) | (Blue << 32) | (Blue << 40) | (Blue << 48) | (Blue << 56)
+	SolvedRed    = uint64(0) | Red | (Red << 8) | (Red << 16) | (Red << 24) | (Red << 32) | (Red << 40) | (Red << 48) | (Red << 56)
+)
 
 var PossibleMoves []string = []string{
 	"F", "R", "L", "B", "U", "D",
@@ -41,12 +49,12 @@ var NotationMatrix map[string]func(*Cube, bool, bool) = map[string]func(*Cube, b
 
 func Create() *Cube {
 	return &Cube{
-		Yellow: uint64(0) | Yellow | (Yellow << 8) | (Yellow << 16) | (Yellow << 24) | (Yellow << 32) | (Yellow << 40) | (Yellow << 48) | (Yellow << 56),
-		Orange: uint64(0) | Orange | (Orange << 8) | (Orange << 16) | (Orange << 24) | (Orange << 32) | (Orange << 40) | (Orange << 48) | (Orange << 56),
-		Green:  uint64(0) | Green | (Green << 8) | (Green << 16) | (Green << 24) | (Green << 32) | (Green << 40) | (Green << 48) | (Green << 56),
-		White:  uint64(0) | White | (White << 8) | (White << 16) | (White << 24) | (White << 32) | (White << 40) | (White << 48) | (White << 56),
-		Blue:   uint64(0) | Blue | (Blue << 8) | (Blue << 16) | (Blue << 24) | (Blue << 32) | (Blue << 40) | (Blue << 48) | (Blue << 56),
-		Red:    uint64(0) | Red | (Red << 8) | (Red << 16) | (Red << 24) | (Red << 32) | (Red << 40) | (Red << 48) | (Red << 56),
+		Yellow: SolvedYellow,
+		Orange: SolvedOrange,
+		Green:  SolvedGreen,
+		White:  SolvedWhite,
+		Blue:   SolvedBlue,
+		Red:    SolvedRed,
 	}
 }
 
@@ -64,14 +72,28 @@ func GetRandomMixSequence() (sequence string) {
 	return
 }
 
-func Mix(cube *Cube, sequence []string) *Cube {
+func ApplyMoves(cube *Cube, sequence []string, callback func(cube *Cube)) *Cube {
 	for _, move := range sequence {
 		if function, ok := NotationMatrix[strings.ToUpper(move)]; ok {
 			function(cube, false, false)
+
+			if callback != nil {
+				callback(cube)
+			}
 		} else {
 			log.Fatalf("Unsupported move: %s", move)
 		}
 	}
 
 	return cube
+}
+
+func IsSolved(cube *Cube) bool {
+	if cube.Yellow == SolvedYellow && cube.Orange == SolvedOrange &&
+		cube.Green == SolvedGreen && cube.White == SolvedWhite &&
+		cube.Blue == SolvedBlue && cube.Red == SolvedRed {
+		return true
+	}
+
+	return false
 }
