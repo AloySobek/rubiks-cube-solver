@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -9,16 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/urfave/cli/v2"
-
 	"github.com/AloySobek/Rubik/algorithm"
 	"github.com/AloySobek/Rubik/cube"
+	"github.com/urfave/cli/v2"
 )
 
 func app(ctx *cli.Context) error {
-	sequence := strings.TrimSpace(ctx.String("s"))
+	sequence := ctx.Args().Get(0)
 
-	if sequence == "random" || sequence == "" {
+	if sequence == "" {
 		sequence = cube.GetRandomMixSequence()
 	} else {
 		sequence = regexp.MustCompile("\\s+").ReplaceAllString(sequence, " ")
@@ -32,36 +30,24 @@ func app(ctx *cli.Context) error {
 	cube.Print(c)
 
 	start := time.Now()
+
 	solution, c := algorithm.Solve(c)
+
 	elapsed := time.Since(start)
 
-	fmt.Printf("\nSolution sequence: %s\n\n", solution)
-	fmt.Printf("Solution time: %d\n\n", elapsed)
+	c = cube.ApplyMoves(c, solution, nil)
 
-	fmt.Printf("Would you like to see cube is solved move by move? (y/n)\n")
+	fmt.Printf("\nSolution sequence: %s\n\nSolution time: %f\n\nSolved cube:\n\n", solution, elapsed.Seconds())
 
-	reader := bufio.NewReader(os.Stdin)
-
-	if text, error := reader.ReadString('\n'); error != nil {
-		return error
-	} else if strings.Replace(text, "\n", "", -1) == "y" {
-		cube.ApplyMoves(c, strings.Split(strings.TrimSpace(solution), " "), nil)
-	}
+	cube.Print(c)
 
 	return nil
 }
 
 func main() {
 	app := &cli.App{
-		Name:  "Rubik",
-		Usage: "Rubik's cube solver",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "s",
-				Value: "random",
-				Usage: "Space separated sequence of moves to mix the cube",
-			},
-		},
+		Name:   "Rubik",
+		Usage:  "Rubik's cube solver",
 		Action: app,
 	}
 

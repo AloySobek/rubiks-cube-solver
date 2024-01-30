@@ -1,27 +1,29 @@
 package cube
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Print(cube *Cube) {
-	buffer := make([][]rune, 15)
+	buffer := make([][]rune, 11)
 
-	for i := 0; i < 15; i += 1 {
-		buffer[i] = make([]rune, 11)
+	for i := 0; i < 11; i += 1 {
+		buffer[i] = make([]rune, 15)
 	}
 
-	putSide(buffer, cube.Blue, 'B', 8, 4)
-	putSide(buffer, cube.Red, 'R', 8, 8)
-	putSide(buffer, cube.Orange, 'O', 8, 0)
-	putSide(buffer, cube.Green, 'G', 0, 4)
-	putSide(buffer, cube.Yellow, 'Y', 4, 4)
-	putSide(buffer, cube.White, 'W', 12, 4)
+	putSide(buffer, cube.White, 'W', 0, 4)
+	putSide(buffer, cube.Orange, 'O', 4, 0)
+	putSide(buffer, cube.Green, 'G', 4, 4)
+	putSide(buffer, cube.Red, 'R', 4, 8)
+	putSide(buffer, cube.Blue, 'B', 4, 12)
+	putSide(buffer, cube.Yellow, 'Y', 8, 4)
 
 	render(buffer)
 }
 
 func render(buffer [][]rune) {
-	for y := 0; y < 15; y += 1 {
-		for x := 0; x < 11; x += 1 {
+	for y := 0; y < 11; y += 1 {
+		for x := 0; x < 15; x += 1 {
 			switch buffer[y][x] {
 			case 'B':
 				fmt.Printf("🟦")

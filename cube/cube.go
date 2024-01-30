@@ -4,7 +4,6 @@ import (
 	"log"
 	"math/rand"
 	"strings"
-	"time"
 )
 
 type Cube struct {
@@ -59,8 +58,6 @@ func Create() *Cube {
 }
 
 func GetRandomMixSequence() (sequence string) {
-	rand.Seed(time.Now().Unix())
-
 	for i := 0; i < 100; i += 1 {
 		sequence += PossibleMoves[rand.Intn(len(PossibleMoves))]
 
