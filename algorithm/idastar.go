@@ -1,5 +1,0 @@
-package algorithm
-
-func IDAStar() {
-
-}

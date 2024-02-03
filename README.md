@@ -4,3 +4,5 @@ Rubik's cube is a puzzle in the form of a plastic cube covered with multicoloure
 
 
 The super-flip scramble: R L U2 F U’ D F2 R2 B2 L U2 F’ B’ U R2 D F2 U R2 U
+
+https://rubikscu.be/

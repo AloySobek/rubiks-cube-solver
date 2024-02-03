@@ -1,10 +1,18 @@
 package cube
 
-func Front(cube *Cube, reverse, double bool) {
-	rotateBlue(cube, reverse)
+func Up(cube *Cube, reverse, double bool) {
+	rotateYellow(cube, reverse)
 
 	if double {
-		rotateBlue(cube, reverse)
+		rotateYellow(cube, reverse)
+	}
+}
+
+func Down(cube *Cube, reverse, double bool) {
+	rotateWhite(cube, reverse)
+
+	if double {
+		rotateWhite(cube, reverse)
 	}
 }
 
@@ -24,27 +32,19 @@ func Left(cube *Cube, reverse, double bool) {
 	}
 }
 
+func Front(cube *Cube, reverse, double bool) {
+	rotateBlue(cube, reverse)
+
+	if double {
+		rotateBlue(cube, reverse)
+	}
+}
+
 func Back(cube *Cube, reverse, double bool) {
 	rotateGreen(cube, reverse)
 
 	if double {
 		rotateGreen(cube, reverse)
-	}
-}
-
-func Up(cube *Cube, reverse, double bool) {
-	rotateYellow(cube, reverse)
-
-	if double {
-		rotateYellow(cube, reverse)
-	}
-}
-
-func Down(cube *Cube, reverse, double bool) {
-	rotateWhite(cube, reverse)
-
-	if double {
-		rotateWhite(cube, reverse)
 	}
 }
 

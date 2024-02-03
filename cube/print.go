@@ -11,12 +11,12 @@ func Print(cube *Cube) {
 		buffer[i] = make([]rune, 15)
 	}
 
-	putSide(buffer, cube.White, 'W', 0, 4)
+	putSide(buffer, cube.Yellow, 'Y', 0, 4)
 	putSide(buffer, cube.Orange, 'O', 4, 0)
-	putSide(buffer, cube.Green, 'G', 4, 4)
+	putSide(buffer, cube.Blue, 'B', 4, 4)
 	putSide(buffer, cube.Red, 'R', 4, 8)
-	putSide(buffer, cube.Blue, 'B', 4, 12)
-	putSide(buffer, cube.Yellow, 'Y', 8, 4)
+	putSide(buffer, cube.Green, 'G', 4, 12)
+	putSide(buffer, cube.White, 'W', 8, 4)
 
 	render(buffer)
 }

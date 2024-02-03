@@ -7,15 +7,14 @@ import (
 )
 
 type Cube struct {
-	Yellow uint64 // Up side
-	Orange uint64 // Left side
-	Green  uint64 // Back side
-	White  uint64 // Down side
-	Blue   uint64 // Front side
-	Red    uint64 // Right side
+	Yellow uint64
+	Orange uint64
+	Green  uint64
+	White  uint64
+	Blue   uint64
+	Red    uint64
 }
 
-// Cubie color code
 const (
 	Yellow = 1
 	Orange = 2
@@ -57,11 +56,22 @@ func Create() *Cube {
 	}
 }
 
-func GetRandomMixSequence() (sequence string) {
-	for i := 0; i < 100; i += 1 {
+func Copy(c *Cube) *Cube {
+	return &Cube{
+		Yellow: c.Yellow,
+		Orange: c.Orange,
+		Green:  c.Green,
+		White:  c.White,
+		Blue:   c.Blue,
+		Red:    c.Red,
+	}
+}
+
+func GetRandomMixSequence(n int) (sequence string) {
+	for i := 0; i < n; i += 1 {
 		sequence += PossibleMoves[rand.Intn(len(PossibleMoves))]
 
-		if i+1 != 100 {
+		if i+1 != n {
 			sequence += " "
 		}
 	}

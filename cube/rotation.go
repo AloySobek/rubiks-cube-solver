@@ -3,153 +3,142 @@ package cube
 import "math/bits"
 
 const (
-	CLR_ZERO  = 0xFFFFFFFFFFFFFF00
-	CLR_ONE   = 0xFFFFFFFFFFFF00FF
-	CLR_TWO   = 0xFFFFFFFFFF00FFFF
-	CLR_THREE = 0xFFFFFFFF00FFFFFF
-	CLR_FOUR  = 0xFFFFFF00FFFFFFFF
-	CLR_FIVE  = 0xFFFF00FFFFFFFFFF
-	CLR_SIX   = 0xFF00FFFFFFFFFFFF
-	CLR_SEVEN = 0x00FFFFFFFFFFFFFF
+	CLR_0 = 0xFFFFFFFFFFFFFF00
+	CLR_1 = 0xFFFFFFFFFFFF00FF
+	CLR_2 = 0xFFFFFFFFFF00FFFF
+	CLR_3 = 0xFFFFFFFF00FFFFFF
+	CLR_4 = 0xFFFFFF00FFFFFFFF
+	CLR_5 = 0xFFFF00FFFFFFFFFF
+	CLR_6 = 0xFF00FFFFFFFFFFFF
+	CLR_7 = 0x00FFFFFFFFFFFFFF
 
-	GET_ZERO  = 0x00000000000000FF
-	GET_ONE   = 0x000000000000FF00
-	GET_TWO   = 0x0000000000FF0000
-	GET_THREE = 0x00000000FF000000
-	GET_FOUR  = 0x000000FF00000000
-	GET_FIVE  = 0x0000FF0000000000
-	GET_SIX   = 0x00FF000000000000
-	GET_SEVEN = 0xFF00000000000000
+	GET_0 = 0x00000000000000FF
+	GET_1 = 0x000000000000FF00
+	GET_2 = 0x0000000000FF0000
+	GET_3 = 0x00000000FF000000
+	GET_4 = 0x000000FF00000000
+	GET_5 = 0x0000FF0000000000
+	GET_6 = 0x00FF000000000000
+	GET_7 = 0xFF00000000000000
 )
 
 func rotateBlue(cube *Cube, reverse bool) {
+	red := cube.Red
+
 	if !reverse {
 		cube.Blue = bits.RotateLeft64(cube.Blue, 16)
 
-		red := cube.Red
-
-		cube.Red = (cube.Red & CLR_ZERO & CLR_SIX & CLR_SEVEN) | ((cube.Yellow & GET_FOUR) << 16) | ((cube.Yellow & GET_FIVE) << 16) | ((cube.Yellow & GET_SIX) >> 48)
-		cube.Yellow = (cube.Yellow & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Orange & GET_TWO) << 16) | ((cube.Orange & GET_THREE) << 16) | ((cube.Orange & GET_FOUR) << 16)
-		cube.Orange = (cube.Orange & CLR_TWO & CLR_THREE & CLR_FOUR) | ((cube.White & GET_ZERO) << 16) | ((cube.White & GET_ONE) << 16) | ((cube.White & GET_TWO) << 16)
-		cube.White = (cube.White & CLR_ZERO & CLR_ONE & CLR_TWO) | ((red & GET_ZERO) << 16) | ((red & GET_SIX) >> 48) | ((red & GET_SEVEN) >> 48)
+		cube.Red = (cube.Red & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.Yellow&GET_4)|(cube.Yellow&GET_5)|(cube.Yellow&GET_6), 16)
+		cube.Yellow = (cube.Yellow & CLR_4 & CLR_5 & CLR_6) | bits.RotateLeft64((cube.Orange&GET_2)|(cube.Orange&GET_3)|(cube.Orange&GET_4), 16)
+		cube.Orange = (cube.Orange & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.White&GET_0)|(cube.White&GET_1)|(cube.White&GET_2), 16)
+		cube.White = (cube.White & CLR_0 & CLR_1 & CLR_2) | bits.RotateLeft64((red&GET_0)|(red&GET_6)|(red&GET_7), 16)
 	} else {
 		cube.Blue = bits.RotateLeft64(cube.Blue, -16)
 
-		orange := cube.Orange
-
-		cube.Orange = (cube.Orange & CLR_TWO & CLR_THREE & CLR_FOUR) | ((cube.Yellow & GET_FOUR) >> 16) | ((cube.Yellow & GET_FIVE) >> 16) | ((cube.Yellow & GET_SIX) >> 16)
-		cube.Yellow = (cube.Yellow & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Red & GET_ZERO) << 48) | ((cube.Red & GET_SIX) >> 16) | ((cube.Red & GET_SEVEN) >> 16)
-		cube.Red = (cube.Red & CLR_ZERO & CLR_SIX & CLR_SEVEN) | ((cube.White & GET_ZERO) << 48) | ((cube.White & GET_ONE) << 48) | ((cube.White & GET_TWO) >> 16)
-		cube.White = (cube.White & CLR_ZERO & CLR_ONE & CLR_TWO) | ((orange & GET_TWO) >> 16) | ((orange & GET_THREE) >> 16) | ((orange & GET_FOUR) >> 16)
+		cube.Red = (cube.Red & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.White&GET_0)|(cube.White&GET_1)|(cube.White&GET_2), -16)
+		cube.White = (cube.White & CLR_0 & CLR_1 & CLR_2) | bits.RotateLeft64((cube.Orange&GET_2)|(cube.Orange&GET_3)|(cube.Orange&GET_4), -16)
+		cube.Orange = (cube.Orange & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.Yellow&GET_4)|(cube.Yellow&GET_5)|(cube.Yellow&GET_6), -16)
+		cube.Yellow = (cube.Yellow & CLR_4 & CLR_5 & CLR_6) | bits.RotateLeft64((red&GET_0)|(red&GET_6)|(red&GET_7), -16)
 	}
 }
 
 func rotateRed(cube *Cube, reverse bool) {
+	green := cube.Green
+
 	if !reverse {
 		cube.Red = bits.RotateLeft64(cube.Red, 16)
 
-		green := cube.Green
-
-		cube.Green = (cube.Green & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.Yellow & GET_TWO) | (cube.Yellow & GET_THREE) | (cube.Yellow & GET_FOUR)
-		cube.Yellow = (cube.Yellow & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.Blue & GET_TWO) | (cube.Blue & GET_THREE) | (cube.Blue & GET_FOUR)
-		cube.Blue = (cube.Blue & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.White & GET_TWO) | (cube.White & GET_THREE) | (cube.White & GET_FOUR)
-		cube.White = (cube.White & CLR_TWO & CLR_THREE & CLR_FOUR) | (green & GET_TWO) | (green & GET_THREE) | (green & GET_FOUR)
+		cube.Green = (cube.Green & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.Yellow&GET_2)|(cube.Yellow&GET_3)|(cube.Yellow&GET_4), 32)
+		cube.Yellow = (cube.Yellow & CLR_2 & CLR_3 & CLR_4) | (cube.Blue & GET_2) | (cube.Blue & GET_3) | (cube.Blue & GET_4)
+		cube.Blue = (cube.Blue & CLR_2 & CLR_3 & CLR_4) | (cube.White & GET_2) | (cube.White & GET_3) | (cube.White & GET_4)
+		cube.White = (cube.White & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((green&GET_0)|(green&GET_6)|(green&GET_7), 32)
 	} else {
 		cube.Red = bits.RotateLeft64(cube.Red, -16)
 
-		blue := cube.Blue
-
-		cube.Blue = (cube.Blue & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.Yellow & GET_TWO) | (cube.Yellow & GET_THREE) | (cube.Yellow & GET_FOUR)
-		cube.Yellow = (cube.Yellow & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.Green & GET_TWO) | (cube.Green & GET_THREE) | (cube.Green & GET_FOUR)
-		cube.Green = (cube.Green & CLR_TWO & CLR_THREE & CLR_FOUR) | (cube.White & GET_TWO) | (cube.White & GET_THREE) | (cube.White & GET_FOUR)
-		cube.White = (cube.White & CLR_TWO & CLR_THREE & CLR_FOUR) | (blue & GET_TWO) | (blue & GET_THREE) | (blue & GET_FOUR)
+		cube.Green = (cube.Green & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.White&GET_2)|(cube.White&GET_3)|(cube.White&GET_4), 32)
+		cube.White = (cube.White & CLR_2 & CLR_3 & CLR_4) | (cube.Blue & GET_2) | (cube.Blue & GET_3) | (cube.Blue & GET_4)
+		cube.Blue = (cube.Blue & CLR_2 & CLR_3 & CLR_4) | (cube.Yellow & GET_2) | (cube.Yellow & GET_3) | (cube.Yellow & GET_4)
+		cube.Yellow = (cube.Yellow & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((green&GET_0)|(green&GET_6)|(green&GET_7), 32)
 	}
 }
 
 func rotateOrange(cube *Cube, reverse bool) {
+	blue := cube.Blue
+
 	if !reverse {
 		cube.Orange = bits.RotateLeft64(cube.Orange, 16)
 
-		blue := cube.Blue
-
-		cube.Blue = (cube.Blue & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.Yellow & GET_ZERO) | (cube.Yellow & GET_SIX) | (cube.Yellow & GET_SEVEN)
-		cube.Yellow = (cube.Yellow & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.Green & GET_ZERO) | (cube.Green & GET_SIX) | (cube.Green & GET_SEVEN)
-		cube.Green = (cube.Green & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.White & GET_ZERO) | (cube.White & GET_SIX) | (cube.White & GET_SEVEN)
-		cube.White = (cube.White & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (blue & GET_ZERO) | (blue & GET_SIX) | (blue & GET_SEVEN)
+		cube.Blue = (cube.Blue & CLR_0 & CLR_6 & CLR_7) | (cube.Yellow & GET_0) | (cube.Yellow & GET_6) | (cube.Yellow & GET_7)
+		cube.Yellow = (cube.Yellow & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.Green&GET_2)|(cube.Green&GET_3)|(cube.Green&GET_4), -32)
+		cube.Green = (cube.Green & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.White&GET_0)|(cube.White&GET_6)|(cube.White&GET_7), 32)
+		cube.White = (cube.White & CLR_0 & CLR_6 & CLR_7) | (blue & GET_0) | (blue & GET_6) | (blue & GET_7)
 	} else {
 		cube.Orange = bits.RotateLeft64(cube.Orange, -16)
 
-		green := cube.Green
-
-		cube.Green = (cube.Green & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.Yellow & GET_ZERO) | (cube.Yellow & GET_SIX) | (cube.Yellow & GET_SEVEN)
-		cube.Yellow = (cube.Yellow & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.Blue & GET_ZERO) | (cube.Blue & GET_SIX) | (cube.Blue & GET_SEVEN)
-		cube.Blue = (cube.Blue & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (cube.White & GET_ZERO) | (cube.White & GET_SIX) | (cube.White & GET_SEVEN)
-		cube.White = (cube.White & CLR_ZERO & CLR_SIX & CLR_SEVEN) | (green & GET_ZERO) | (green & GET_SIX) | (green & GET_SEVEN)
+		cube.Blue = (cube.Blue & CLR_0 & CLR_6 & CLR_7) | (cube.White & GET_0) | (cube.White & GET_6) | (cube.White & GET_7)
+		cube.White = (cube.White & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.Green&GET_2)|(cube.Green&GET_3)|(cube.Green&GET_4), -32)
+		cube.Green = (cube.Green & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.Yellow&GET_0)|(cube.Yellow&GET_6)|(cube.Yellow&GET_7), 32)
+		cube.Yellow = (cube.Yellow & CLR_0 & CLR_6 & CLR_7) | (blue & GET_0) | (blue & GET_6) | (blue & GET_7)
 	}
 }
 
 func rotateGreen(cube *Cube, reverse bool) {
+	orange := cube.Orange
+
 	if !reverse {
 		cube.Green = bits.RotateLeft64(cube.Green, 16)
 
-		red := cube.Red
-
-		cube.Red = (cube.Red & CLR_TWO & CLR_THREE & CLR_FOUR) | ((cube.White & GET_FOUR) >> 16) | ((cube.White & GET_FIVE) >> 16) | ((cube.White & GET_SIX) >> 16)
-		cube.White = (cube.White & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Orange & GET_ZERO) << 48) | ((cube.Orange & GET_SIX) >> 16) | ((cube.Orange & GET_SEVEN) >> 16)
-		cube.Orange = (cube.Orange & CLR_ZERO & CLR_SIX & CLR_SEVEN) | ((cube.Yellow & GET_ZERO) << 48) | ((cube.Yellow & GET_ONE) << 48) | ((cube.Yellow & GET_TWO) >> 16)
-		cube.Yellow = (cube.Yellow & CLR_ZERO & CLR_ONE & CLR_TWO) | ((red & GET_TWO) >> 16) | ((red & GET_THREE) >> 16) | ((red & GET_FOUR) >> 16)
+		cube.Orange = (cube.Orange & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.Yellow&GET_0)|(cube.Yellow&GET_1)|(cube.Yellow&GET_2), -16)
+		cube.Yellow = (cube.Yellow & CLR_0 & CLR_1 & CLR_2) | bits.RotateLeft64((cube.Red&GET_2)|(cube.Red&GET_3)|(cube.Red&GET_4), -16)
+		cube.Red = (cube.Red & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.White&GET_4)|(cube.White&GET_5)|(cube.White&GET_6), -16)
+		cube.White = (cube.White & CLR_4 & CLR_5 & CLR_6) | bits.RotateLeft64((orange&GET_0)|(orange&GET_6)|(orange&GET_7), -16)
 	} else {
 		cube.Green = bits.RotateLeft64(cube.Green, -16)
 
-		orange := cube.Orange
-
-		cube.Orange = (cube.Orange & CLR_ZERO & CLR_SIX & CLR_SEVEN) | ((cube.White & GET_FOUR) << 16) | ((cube.White & GET_FIVE) << 16) | ((cube.White & GET_SIX) >> 48)
-		cube.White = (cube.White & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Red & GET_TWO) << 16) | ((cube.Red & GET_THREE) << 16) | ((cube.Red & GET_FOUR) << 16)
-		cube.Red = (cube.Red & CLR_TWO & CLR_THREE & CLR_FOUR) | ((cube.Yellow & GET_ZERO) << 16) | ((cube.Yellow & GET_ONE) << 16) | ((cube.Yellow & GET_TWO) << 16)
-		cube.Yellow = (cube.Yellow & CLR_ZERO & CLR_ONE & CLR_TWO) | ((orange & GET_ZERO) << 16) | ((orange & GET_SIX) >> 48) | ((orange & GET_SEVEN) >> 48)
+		cube.Orange = (cube.Orange & CLR_0 & CLR_6 & CLR_7) | bits.RotateLeft64((cube.White&GET_4)|(cube.White&GET_5)|(cube.White&GET_6), 16)
+		cube.White = (cube.White & CLR_4 & CLR_5 & CLR_6) | bits.RotateLeft64((cube.Red&GET_2)|(cube.Red&GET_3)|(cube.Red&GET_4), 16)
+		cube.Red = (cube.Red & CLR_2 & CLR_3 & CLR_4) | bits.RotateLeft64((cube.Yellow&GET_0)|(cube.Yellow&GET_1)|(cube.Yellow&GET_2), 16)
+		cube.Yellow = (cube.Yellow & CLR_0 & CLR_1 & CLR_2) | bits.RotateLeft64((orange&GET_0)|(orange&GET_6)|(orange&GET_7), 16)
 	}
 }
 
 func rotateYellow(cube *Cube, reverse bool) {
+	red := cube.Red
+
 	if !reverse {
 		cube.Yellow = bits.RotateLeft64(cube.Yellow, 16)
 
-		red := cube.Red
-
-		cube.Red = (cube.Red & CLR_ZERO & CLR_ONE & CLR_TWO) | ((cube.Green & GET_FOUR) >> 32) | ((cube.Green & GET_FIVE) >> 32) | ((cube.Green & GET_SIX) >> 32)
-		cube.Green = (cube.Green & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Orange & GET_ZERO) << 32) | ((cube.Orange & GET_ONE) << 32) | ((cube.Orange & GET_TWO) << 32)
-		cube.Orange = (cube.Orange & CLR_ZERO & CLR_ONE & CLR_TWO) | (cube.Blue & GET_ZERO) | (cube.Blue & GET_ONE) | (cube.Blue & GET_TWO)
-		cube.Blue = (cube.Blue & CLR_ZERO & CLR_ONE & CLR_TWO) | (red & GET_ZERO) | (red & GET_ONE) | (red & GET_TWO)
+		cube.Red = (cube.Red & CLR_0 & CLR_1 & CLR_2) | (cube.Green & GET_0) | (cube.Green & GET_1) | (cube.Green & GET_2)
+		cube.Green = (cube.Green & CLR_0 & CLR_1 & CLR_2) | (cube.Orange & GET_0) | (cube.Orange & GET_1) | (cube.Orange & GET_2)
+		cube.Orange = (cube.Orange & CLR_0 & CLR_1 & CLR_2) | (cube.Blue & GET_0) | (cube.Blue & GET_1) | (cube.Blue & GET_2)
+		cube.Blue = (cube.Blue & CLR_0 & CLR_1 & CLR_2) | (red & GET_0) | (red & GET_1) | (red & GET_2)
 	} else {
 		cube.Yellow = bits.RotateLeft64(cube.Yellow, -16)
 
-		orange := cube.Orange
-
-		cube.Orange = (cube.Orange & CLR_ZERO & CLR_ONE & CLR_TWO) | ((cube.Green & GET_FOUR) >> 32) | ((cube.Green & GET_FIVE) >> 32) | ((cube.Green & GET_SIX) >> 32)
-		cube.Green = (cube.Green & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Red & GET_ZERO) << 32) | ((cube.Red & GET_ONE) << 32) | ((cube.Red & GET_TWO) << 32)
-		cube.Red = (cube.Red & CLR_ZERO & CLR_ONE & CLR_TWO) | (cube.Blue & GET_ZERO) | (cube.Blue & GET_ONE) | (cube.Blue & GET_TWO)
-		cube.Blue = (cube.Blue & CLR_ZERO & CLR_ONE & CLR_TWO) | (orange & GET_ZERO) | (orange & GET_ONE) | (orange & GET_TWO)
+		cube.Red = (cube.Red & CLR_0 & CLR_1 & CLR_2) | (cube.Blue & GET_0) | (cube.Blue & GET_1) | (cube.Blue & GET_2)
+		cube.Blue = (cube.Blue & CLR_0 & CLR_1 & CLR_2) | (cube.Orange & GET_0) | (cube.Orange & GET_1) | (cube.Orange & GET_2)
+		cube.Orange = (cube.Orange & CLR_0 & CLR_1 & CLR_2) | (cube.Green & GET_0) | (cube.Green & GET_1) | (cube.Green & GET_2)
+		cube.Green = (cube.Green & CLR_0 & CLR_1 & CLR_2) | (red & GET_0) | (red & GET_1) | (red & GET_2)
 	}
 }
 
 func rotateWhite(cube *Cube, reverse bool) {
+	red := cube.Red
+
 	if !reverse {
 		cube.White = bits.RotateLeft64(cube.White, 16)
 
-		red := cube.Red
+		cube.Red = (cube.Red & CLR_4 & CLR_5 & CLR_6) | (cube.Blue & GET_4) | (cube.Blue & GET_5) | (cube.Blue & GET_6)
+		cube.Blue = (cube.Blue & CLR_4 & CLR_5 & CLR_6) | (cube.Orange & GET_4) | (cube.Orange & GET_5) | (cube.Orange & GET_6)
+		cube.Orange = (cube.Orange & CLR_4 & CLR_5 & CLR_6) | (cube.Green & GET_4) | (cube.Green & GET_5) | (cube.Green & GET_6)
+		cube.Green = (cube.Green & CLR_4 & CLR_5 & CLR_6) | (red & GET_4) | (red & GET_5) | (red & GET_6)
 
-		cube.Red = (cube.Red & CLR_FOUR & CLR_FIVE & CLR_SIX) | (cube.Blue & GET_FOUR) | (cube.Blue & GET_FIVE) | (cube.Blue & GET_SIX)
-		cube.Blue = (cube.Blue & CLR_FOUR & CLR_FIVE & CLR_SIX) | (cube.Orange & GET_FOUR) | (cube.Orange & GET_FIVE) | (cube.Orange & GET_SIX)
-		cube.Orange = (cube.Orange & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Green & GET_ZERO) << 32) | ((cube.Green & GET_ONE) << 32) | ((cube.Green & GET_TWO) << 32)
-		cube.Green = (cube.Green & CLR_ZERO & CLR_ONE & CLR_TWO) | ((red & GET_FOUR) >> 32) | ((red & GET_FIVE) >> 32) | ((red & GET_SIX) >> 32)
 	} else {
 		cube.White = bits.RotateLeft64(cube.White, -16)
 
-		orange := cube.Orange
-
-		cube.Orange = (cube.Orange & CLR_FOUR & CLR_FIVE & CLR_SIX) | (cube.Blue & GET_FOUR) | (cube.Blue & GET_FIVE) | (cube.Blue & GET_SIX)
-		cube.Blue = (cube.Blue & CLR_FOUR & CLR_FIVE & CLR_SIX) | (cube.Red & GET_FOUR) | (cube.Red & GET_FIVE) | (cube.Red & GET_SIX)
-		cube.Red = (cube.Red & CLR_FOUR & CLR_FIVE & CLR_SIX) | ((cube.Green & GET_ZERO) << 32) | ((cube.Green & GET_ONE) << 32) | ((cube.Green & GET_TWO) << 32)
-		cube.Green = (cube.Green & CLR_ZERO & CLR_ONE & CLR_TWO) | ((orange & GET_FOUR) >> 32) | ((orange & GET_FIVE) >> 32) | ((orange & GET_SIX) >> 32)
+		cube.Red = (cube.Red & CLR_4 & CLR_5 & CLR_6) | (cube.Green & GET_4) | (cube.Green & GET_5) | (cube.Green & GET_6)
+		cube.Green = (cube.Green & CLR_4 & CLR_5 & CLR_6) | (cube.Orange & GET_4) | (cube.Orange & GET_5) | (cube.Orange & GET_6)
+		cube.Orange = (cube.Orange & CLR_4 & CLR_5 & CLR_6) | (cube.Blue & GET_4) | (cube.Blue & GET_5) | (cube.Blue & GET_6)
+		cube.Blue = (cube.Blue & CLR_4 & CLR_5 & CLR_6) | (red & GET_4) | (red & GET_5) | (red & GET_6)
 	}
 }
