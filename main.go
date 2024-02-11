@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-	"unsafe"
 
 	"github.com/AloySobek/Rubik/algorithm"
 	"github.com/AloySobek/Rubik/cube"
@@ -27,21 +26,25 @@ func app(ctx *cli.Context) error {
 
 	c := cube.ApplyMoves(cube.Create(), strings.Split(sequence, " "), nil)
 
-	fmt.Printf("Size of struct: %d\n", unsafe.Sizeof(*c))
-
 	fmt.Printf("Mixed cube:\n\n")
 
 	cube.Print(c)
 
 	start := time.Now()
 
-	solution := algorithm.Solve(c)
+	solution := algorithm.Solve(c, len(strings.Split(sequence, " ")))
 
 	elapsed := time.Since(start)
 
-	fmt.Printf("Hello: %s\n", solution)
-
 	c = cube.ApplyMoves(c, strings.Split(solution, " "), nil)
+
+	if !cube.IsGoodEdges(c) {
+		fmt.Println("BAD EDGE DETECTED!")
+	}
+
+	if !cube.IsGoodCorners(c) {
+		fmt.Println("BAD CORNER DETECTED!")
+	}
 
 	fmt.Printf("\nSolution sequence: %s\n\nSolution time: %f\n\nSolved cube:\n\n", solution, elapsed.Seconds())
 

@@ -1,97 +1,49 @@
 package cube
 
-func Up(cube *Cube, reverse, double bool) {
+func Up(cube *Cube, reverse bool) {
 	rotateYellow(cube, reverse)
-
-	if double {
-		rotateYellow(cube, reverse)
-	}
 }
 
-func Down(cube *Cube, reverse, double bool) {
+func Down(cube *Cube, reverse bool) {
 	rotateWhite(cube, reverse)
-
-	if double {
-		rotateWhite(cube, reverse)
-	}
 }
 
-func Right(cube *Cube, reverse, double bool) {
+func Right(cube *Cube, reverse bool) {
 	rotateRed(cube, reverse)
-
-	if double {
-		rotateRed(cube, reverse)
-	}
 }
 
-func Left(cube *Cube, reverse, double bool) {
+func Left(cube *Cube, reverse bool) {
 	rotateOrange(cube, reverse)
-
-	if double {
-		rotateOrange(cube, reverse)
-	}
 }
 
-func Front(cube *Cube, reverse, double bool) {
+func Front(cube *Cube, reverse bool) {
 	rotateBlue(cube, reverse)
-
-	if double {
-		rotateBlue(cube, reverse)
-	}
 }
 
-func Back(cube *Cube, reverse, double bool) {
+func Back(cube *Cube, reverse bool) {
 	rotateGreen(cube, reverse)
-
-	if double {
-		rotateGreen(cube, reverse)
-	}
 }
 
-func RFront(cube *Cube, _, _ bool) {
-	Front(cube, true, false)
+func RFront(cube *Cube, _ bool) {
+	Front(cube, true)
 }
 
-func RRight(cube *Cube, _, _ bool) {
-	Right(cube, true, false)
+func RRight(cube *Cube, _ bool) {
+	Right(cube, true)
 }
 
-func RLeft(cube *Cube, _, _ bool) {
-	Left(cube, true, false)
+func RLeft(cube *Cube, _ bool) {
+	Left(cube, true)
 }
 
-func RBack(cube *Cube, _, _ bool) {
-	Back(cube, true, false)
+func RBack(cube *Cube, _ bool) {
+	Back(cube, true)
 }
 
-func RUp(cube *Cube, _, _ bool) {
-	Up(cube, true, false)
+func RUp(cube *Cube, _ bool) {
+	Up(cube, true)
 }
 
-func RDown(cube *Cube, _, _ bool) {
-	Down(cube, true, false)
-}
-
-func DFront(cube *Cube, _, _ bool) {
-	Front(cube, false, true)
-}
-
-func DRight(cube *Cube, _, _ bool) {
-	Right(cube, false, true)
-}
-
-func DLeft(cube *Cube, _, _ bool) {
-	Left(cube, false, true)
-}
-
-func DBack(cube *Cube, _, _ bool) {
-	Back(cube, false, true)
-}
-
-func DUp(cube *Cube, _, _ bool) {
-	Up(cube, false, true)
-}
-
-func DDown(cube *Cube, _, _ bool) {
-	Down(cube, false, true)
+func RDown(cube *Cube, _ bool) {
+	Down(cube, true)
 }

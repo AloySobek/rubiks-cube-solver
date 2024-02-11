@@ -39,10 +39,68 @@ var PossibleMoves []string = []string{
 	"F2", "R2", "L2", "B2", "U2", "D2",
 }
 
-var NotationMatrix map[string]func(*Cube, bool, bool) = map[string]func(*Cube, bool, bool){
-	"F": Front, "R": Right, "L": Left, "B": Back, "U": Up, "D": Down,
-	"F'": RFront, "R'": RRight, "L'": RLeft, "B'": RBack, "U'": RUp, "D'": RDown,
-	"F2": DFront, "R2": DRight, "L2": DLeft, "B2": DBack, "U2": DUp, "D2": DDown,
+var NotationMatrix map[string]func(*Cube, bool) = map[string]func(*Cube, bool){
+	"F":  Front,
+	"B":  Back,
+	"R":  Right,
+	"L":  Left,
+	"U":  Up,
+	"D":  Down,
+	"F'": RFront,
+	"B'": RBack,
+	"R'": RRight,
+	"L'": RLeft,
+	"U'": RUp,
+	"D'": RDown,
+	"F2": func(c *Cube, _ bool) { Front(c, false); Front(c, false) },
+	"R2": func(c *Cube, _ bool) { Right(c, false); Right(c, false) },
+	"L2": func(c *Cube, _ bool) { Left(c, false); Left(c, false) },
+	"B2": func(c *Cube, _ bool) { Back(c, false); Back(c, false) },
+	"U2": func(c *Cube, _ bool) { Up(c, false); Up(c, false) },
+	"D2": func(c *Cube, _ bool) { Down(c, false); Down(c, false) },
+}
+
+var NotationMatrix1 map[string]func(*Cube, bool) = map[string]func(*Cube, bool){
+	"F":  Front,
+	"B":  Back,
+	"R":  Right,
+	"L":  Left,
+	"F'": RFront,
+	"B'": RBack,
+	"R'": RRight,
+	"L'": RLeft,
+	"F2": func(c *Cube, _ bool) { Front(c, false); Front(c, false) },
+	"R2": func(c *Cube, _ bool) { Right(c, false); Right(c, false) },
+	"L2": func(c *Cube, _ bool) { Left(c, false); Left(c, false) },
+	"B2": func(c *Cube, _ bool) { Back(c, false); Back(c, false) },
+	"U2": func(c *Cube, _ bool) { Up(c, false); Up(c, false) },
+	"D2": func(c *Cube, _ bool) { Down(c, false); Down(c, false) },
+}
+
+var NotationMatrix2 map[string]func(*Cube, bool) = map[string]func(*Cube, bool){
+	// "F": Front,
+	// "B": Back,
+	// "F'": RFront,
+	// "B'": RBack,
+	"R":  Right,
+	"L":  Left,
+	"R'": RRight,
+	"L'": RLeft,
+	"F2": func(c *Cube, _ bool) { Front(c, false); Front(c, false) },
+	"R2": func(c *Cube, _ bool) { Right(c, false); Right(c, false) },
+	"L2": func(c *Cube, _ bool) { Left(c, false); Left(c, false) },
+	"B2": func(c *Cube, _ bool) { Back(c, false); Back(c, false) },
+	"U2": func(c *Cube, _ bool) { Up(c, false); Up(c, false) },
+	"D2": func(c *Cube, _ bool) { Down(c, false); Down(c, false) },
+}
+
+var NotationMatrix3 map[string]func(*Cube, bool) = map[string]func(*Cube, bool){
+	"F2": func(c *Cube, _ bool) { Front(c, false); Front(c, false) },
+	"R2": func(c *Cube, _ bool) { Right(c, false); Right(c, false) },
+	"L2": func(c *Cube, _ bool) { Left(c, false); Left(c, false) },
+	"B2": func(c *Cube, _ bool) { Back(c, false); Back(c, false) },
+	"U2": func(c *Cube, _ bool) { Up(c, false); Up(c, false) },
+	"D2": func(c *Cube, _ bool) { Down(c, false); Down(c, false) },
 }
 
 func Create() *Cube {
@@ -82,7 +140,7 @@ func GetRandomMixSequence(n int) (sequence string) {
 func ApplyMoves(cube *Cube, sequence []string, callback func(cube *Cube)) *Cube {
 	for _, move := range sequence {
 		if function, ok := NotationMatrix[strings.ToUpper(move)]; ok {
-			function(cube, false, false)
+			function(cube, false)
 
 			if callback != nil {
 				callback(cube)
@@ -103,4 +161,145 @@ func IsSolved(cube *Cube) bool {
 	}
 
 	return false
+}
+
+func IsGoodEdges(c *Cube) bool {
+	var bad uint64 = Orange | Red
+
+	if ((c.Green&GET_1)>>8)&bad > 0 ||
+		((c.Green&GET_3)>>24)&bad > 0 ||
+		((c.Green&GET_5)>>40)&bad > 0 ||
+		((c.Green&GET_7)>>56)&bad > 0 {
+		return false
+	}
+
+	if ((c.Blue&GET_1)>>8)&bad > 0 ||
+		((c.Blue&GET_3)>>24)&bad > 0 ||
+		((c.Blue&GET_5)>>40)&bad > 0 ||
+		((c.Blue&GET_7)>>56)&bad > 0 {
+		return false
+	}
+
+	if ((c.Yellow&GET_3)>>24)&bad > 0 ||
+		((c.Yellow&GET_7)>>56)&bad > 0 {
+		return false
+	}
+
+	if ((c.White&GET_3)>>24)&bad > 0 ||
+		((c.White&GET_7)>>56)&bad > 0 {
+		return false
+	}
+
+	return true
+}
+
+func IsGoodCorners(c *Cube) bool {
+	var good uint64 = Orange | Red
+	var edges uint64 = White | Yellow | Blue | Green
+
+	if ((c.Yellow&GET_1)>>8)&edges == 0 ||
+		((c.Yellow&GET_5)>>40)&edges == 0 {
+		return false
+	}
+
+	if ((c.Blue&GET_1)>>8)&edges == 0 ||
+		((c.Blue&GET_5)>>40)&edges == 0 {
+		return false
+	}
+
+	if ((c.Green&GET_1)>>8)&edges == 0 ||
+		((c.Green&GET_5)>>40)&edges == 0 {
+		return false
+	}
+
+	if ((c.White&GET_1)>>8)&edges == 0 ||
+		((c.White&GET_5)>>40)&edges == 0 {
+		return false
+	}
+
+	if (c.Red&GET_0)&good == 0 ||
+		((c.Red&GET_2)>>16)&good == 0 ||
+		((c.Red&GET_4)>>32)&good == 0 ||
+		((c.Red&GET_6)>>48)&good == 0 {
+		return false
+	}
+
+	if (c.Orange&GET_0)&good == 0 ||
+		((c.Orange&GET_2)>>16)&good == 0 ||
+		((c.Orange&GET_4)>>32)&good == 0 ||
+		((c.Orange&GET_6)>>48)&good == 0 {
+		return false
+	}
+
+	return true
+}
+
+func IsGoodSides(c *Cube) bool {
+	if (c.Yellow&GET_0)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_1)>>8)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_2)>>16)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_3)>>24)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_4)>>32)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_5)>>40)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_6)>>48)&(Yellow|White) == 0 ||
+		((c.Yellow&GET_7)>>56)&(Yellow|White) == 0 {
+		return false
+	}
+
+	if (c.White&GET_0)&(Yellow|White) == 0 ||
+		((c.White&GET_1)>>8)&(Yellow|White) == 0 ||
+		((c.White&GET_2)>>16)&(Yellow|White) == 0 ||
+		((c.White&GET_3)>>24)&(Yellow|White) == 0 ||
+		((c.White&GET_4)>>32)&(Yellow|White) == 0 ||
+		((c.White&GET_5)>>40)&(Yellow|White) == 0 ||
+		((c.White&GET_6)>>48)&(Yellow|White) == 0 ||
+		((c.White&GET_7)>>56)&(Yellow|White) == 0 {
+		return false
+	}
+
+	if (c.Green&GET_0)&(Green|Blue) == 0 ||
+		((c.Green&GET_1)>>8)&(Green|Blue) == 0 ||
+		((c.Green&GET_2)>>16)&(Green|Blue) == 0 ||
+		((c.Green&GET_3)>>24)&(Green|Blue) == 0 ||
+		((c.Green&GET_4)>>32)&(Green|Blue) == 0 ||
+		((c.Green&GET_5)>>40)&(Green|Blue) == 0 ||
+		((c.Green&GET_6)>>48)&(Green|Blue) == 0 ||
+		((c.Green&GET_7)>>56)&(Green|Blue) == 0 {
+		return false
+	}
+
+	if (c.Blue&GET_0)&(Green|Blue) == 0 ||
+		((c.Blue&GET_1)>>8)&(Green|Blue) == 0 ||
+		((c.Blue&GET_2)>>16)&(Green|Blue) == 0 ||
+		((c.Blue&GET_3)>>24)&(Green|Blue) == 0 ||
+		((c.Blue&GET_4)>>32)&(Green|Blue) == 0 ||
+		((c.Blue&GET_5)>>40)&(Green|Blue) == 0 ||
+		((c.Blue&GET_6)>>48)&(Green|Blue) == 0 ||
+		((c.Blue&GET_7)>>56)&(Green|Blue) == 0 {
+		return false
+	}
+
+	if (c.Orange&GET_0)&(Orange|Red) == 0 ||
+		((c.Orange&GET_1)>>8)&(Orange|Red) == 0 ||
+		((c.Orange&GET_2)>>16)&(Orange|Red) == 0 ||
+		((c.Orange&GET_3)>>24)&(Orange|Red) == 0 ||
+		((c.Orange&GET_4)>>32)&(Orange|Red) == 0 ||
+		((c.Orange&GET_5)>>40)&(Orange|Red) == 0 ||
+		((c.Orange&GET_6)>>48)&(Orange|Red) == 0 ||
+		((c.Orange&GET_7)>>56)&(Orange|Red) == 0 {
+		return false
+	}
+
+	if (c.Red&GET_0)&(Orange|Red) == 0 ||
+		((c.Red&GET_1)>>8)&(Orange|Red) == 0 ||
+		((c.Red&GET_2)>>16)&(Orange|Red) == 0 ||
+		((c.Red&GET_3)>>24)&(Orange|Red) == 0 ||
+		((c.Red&GET_4)>>32)&(Orange|Red) == 0 ||
+		((c.Red&GET_5)>>40)&(Orange|Red) == 0 ||
+		((c.Red&GET_6)>>48)&(Orange|Red) == 0 ||
+		((c.Red&GET_7)>>56)&(Orange|Red) == 0 {
+		return false
+	}
+
+	return true
 }
