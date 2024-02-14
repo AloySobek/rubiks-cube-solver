@@ -24,7 +24,9 @@ func app(ctx *cli.Context) error {
 
 	fmt.Printf("Initial mix sequence: %s\n\n", sequence)
 
-	c := cube.ApplyMoves(cube.Create(), strings.Split(sequence, " "), nil)
+	c := cube.Create()
+
+	cube.ApplyMoves(c, strings.Split(sequence, " "))
 
 	fmt.Printf("Mixed cube:\n")
 

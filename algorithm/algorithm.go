@@ -6,40 +6,39 @@ import (
 )
 
 func Solve(c *cube.Cube) {
-	solution := make([]string, 0, 100)
-
-	IDBFS(c, cube.G0, cube.G0Condition, 7, &solution)
-
-	g1 := cube.ApplyMoves(c, solution, nil)
+	solution := append(make([]string, 0, 100), cube.ApplyMoves(c, IDBFS(c, cube.G0, cube.G0Condition))...)
 
 	fmt.Println(solution)
-	cube.Print(g1)
+	cube.Print(c)
 
-	IDBFS(g1, cube.G1, cube.G1Condition, 10, &solution)
-
-	g2 := cube.ApplyMoves(c, solution, nil)
+	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G1, cube.G1Condition))...)
 
 	fmt.Println(solution)
-	cube.Print(g2)
-	// IDBFS(c, cube.G2, cube.G2Condition, 13, &solution)
-	// IDBFS(c, cube.G3, cube.G3Condition, 15, &solution)
+	cube.Print(c)
+
+	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G2, cube.G2Condition))...)
+
+	fmt.Println(solution)
+	cube.Print(c)
+
+	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G3, cube.G3Condition))...)
+
+	fmt.Println(solution)
+	cube.Print(c)
 }
 
-func IDBFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool, maxDepth int, solution *[]string) {
-	for i := 0; i < maxDepth; i += 1 {
-		if DLS(c, g, s, i, solution) {
-			break
-		}
+func IDBFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool) []string {
+	solution := make([]string, 0, 64)
+
+	for i := 0; !DLS(c, g, s, i, &solution); i += 1 {
 	}
+
+	return solution
 }
 
 func DLS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool, depth int, solution *[]string) bool {
 	if depth <= 0 {
-		if s(c) {
-			return true
-		} else {
-			return false
-		}
+		return s(c)
 	}
 
 	for k, v := range g {

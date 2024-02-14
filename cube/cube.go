@@ -130,20 +130,16 @@ func GetRandomMixSequence(n int) (sequence string) {
 	return
 }
 
-func ApplyMoves(cube *Cube, sequence []string, callback func(cube *Cube)) *Cube {
+func ApplyMoves(cube *Cube, sequence []string) []string {
 	for _, c := range sequence {
 		if move, ok := G0[strings.ToUpper(c)]; ok {
 			move(cube)
-
-			if callback != nil {
-				callback(cube)
-			}
 		} else {
 			log.Fatalf("Unsupported move: %s", c)
 		}
 	}
 
-	return cube
+	return sequence
 }
 
 func Solved(c *Cube) bool {
@@ -206,17 +202,17 @@ func G1Condition(c *Cube) bool {
 		return false
 	}
 
-	if (c.S3&g0)&good == 0 ||
-		((c.S3&g2)>>16)&good == 0 ||
-		((c.S3&g4)>>32)&good == 0 ||
-		((c.S3&g6)>>48)&good == 0 {
-		return false
-	}
-
 	if (c.S1&g0)&good == 0 ||
 		((c.S1&g2)>>16)&good == 0 ||
 		((c.S1&g4)>>32)&good == 0 ||
 		((c.S1&g6)>>48)&good == 0 {
+		return false
+	}
+
+	if (c.S3&g0)&good == 0 ||
+		((c.S3&g2)>>16)&good == 0 ||
+		((c.S3&g4)>>32)&good == 0 ||
+		((c.S3&g6)>>48)&good == 0 {
 		return false
 	}
 
