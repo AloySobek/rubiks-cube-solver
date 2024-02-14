@@ -11,17 +11,19 @@ func Print(cube *Cube) {
 		buffer[i] = make([]rune, 15)
 	}
 
-	putSide(buffer, cube.Yellow, 'Y', 0, 4)
-	putSide(buffer, cube.Orange, 'O', 4, 0)
-	putSide(buffer, cube.Blue, 'B', 4, 4)
-	putSide(buffer, cube.Red, 'R', 4, 8)
-	putSide(buffer, cube.Green, 'G', 4, 12)
-	putSide(buffer, cube.White, 'W', 8, 4)
+	putSide(buffer, cube.S0, 'W', 0, 4)
+	putSide(buffer, cube.S1, 'O', 4, 0)
+	putSide(buffer, cube.S2, 'G', 4, 4)
+	putSide(buffer, cube.S3, 'R', 4, 8)
+	putSide(buffer, cube.S4, 'B', 4, 12)
+	putSide(buffer, cube.S5, 'Y', 8, 4)
 
 	render(buffer)
 }
 
 func render(buffer [][]rune) {
+	fmt.Println()
+
 	for y := 0; y < 11; y += 1 {
 		for x := 0; x < 15; x += 1 {
 			switch buffer[y][x] {
@@ -43,6 +45,8 @@ func render(buffer [][]rune) {
 		}
 		fmt.Println()
 	}
+
+	fmt.Println()
 }
 
 func putSide(buffer [][]rune, side uint64, color rune, iy, ix int) {
@@ -79,18 +83,18 @@ func putSide(buffer [][]rune, side uint64, color rune, iy, ix int) {
 
 func getSideCubieColor(side uint64, position int) rune {
 	switch (side & (uint64(0xFF) << (8 * position))) >> (8 * position) {
-	case Blue:
-		return 'B'
-	case Red:
-		return 'R'
-	case Orange:
-		return 'O'
-	case Green:
+	case S2:
 		return 'G'
-	case Yellow:
-		return 'Y'
-	case White:
+	case S3:
+		return 'R'
+	case S1:
+		return 'O'
+	case S4:
+		return 'B'
+	case S0:
 		return 'W'
+	case S5:
+		return 'Y'
 	default:
 		return ' '
 	}

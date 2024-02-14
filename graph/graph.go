@@ -2,9 +2,8 @@ package graph
 
 import (
 	"bytes"
-	"io/ioutil"
 	"math/rand"
-	"time"
+	"os"
 
 	"github.com/AloySobek/Rubik/cube"
 	"github.com/bradleyjkemp/memviz"
@@ -79,8 +78,6 @@ func GetRandomGraph(origin, goal *Node) *Node {
 		})
 	}
 
-	rand.Seed(time.Now().UTC().UnixNano())
-
 	GenerateRandomIntermidateNodes(origin, goal, rand.Intn(2)+3)
 
 	return origin
@@ -130,7 +127,7 @@ func GenerateRandomIntermidateNodes(origin, goal *Node, depth int) *Node {
 func Print(origin *Node) {
 	buf := &bytes.Buffer{}
 	memviz.Map(buf, origin)
-	err := ioutil.WriteFile("example-tree-data.dot", buf.Bytes(), 0644)
+	err := os.WriteFile("example-tree-data.dot", buf.Bytes(), 0644)
 	if err != nil {
 		panic(err)
 	}

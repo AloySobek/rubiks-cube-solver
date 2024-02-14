@@ -26,29 +26,17 @@ func app(ctx *cli.Context) error {
 
 	c := cube.ApplyMoves(cube.Create(), strings.Split(sequence, " "), nil)
 
-	fmt.Printf("Mixed cube:\n\n")
+	fmt.Printf("Mixed cube:\n")
 
 	cube.Print(c)
 
 	start := time.Now()
 
-	solution := algorithm.Solve(c, len(strings.Split(sequence, " ")))
+	algorithm.Solve(c)
 
 	elapsed := time.Since(start)
 
-	c = cube.ApplyMoves(c, strings.Split(solution, " "), nil)
-
-	if !cube.IsGoodEdges(c) {
-		fmt.Println("BAD EDGE DETECTED!")
-	}
-
-	if !cube.IsGoodCorners(c) {
-		fmt.Println("BAD CORNER DETECTED!")
-	}
-
-	fmt.Printf("\nSolution sequence: %s\n\nSolution time: %f\n\nSolved cube:\n\n", solution, elapsed.Seconds())
-
-	cube.Print(c)
+	fmt.Printf("Solution time: %f\n", elapsed.Seconds())
 
 	return nil
 }

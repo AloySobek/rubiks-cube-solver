@@ -3,211 +3,54 @@ package algorithm
 import (
 	"fmt"
 	"github.com/AloySobek/Rubik/cube"
-	"strings"
 )
 
-type Try struct {
-	cube *cube.Cube
-	move string
+func Solve(c *cube.Cube) {
+	solution := make([]string, 0, 100)
+
+	IDBFS(c, cube.G0, cube.G0Condition, 7, &solution)
+
+	g1 := cube.ApplyMoves(c, solution, nil)
+
+	fmt.Println(solution)
+	cube.Print(g1)
+
+	IDBFS(g1, cube.G1, cube.G1Condition, 10, &solution)
+
+	g2 := cube.ApplyMoves(c, solution, nil)
+
+	fmt.Println(solution)
+	cube.Print(g2)
+	// IDBFS(c, cube.G2, cube.G2Condition, 13, &solution)
+	// IDBFS(c, cube.G3, cube.G3Condition, 15, &solution)
 }
 
-func solve(c *cube.Cube, solution string, lvl, maxDepth int) string {
-	if lvl > maxDepth {
-		return ""
-	}
-
-	i, cs := 0, make([]Try, len(cube.NotationMatrix))
-
-	for k, v := range cube.NotationMatrix {
-		cs[i] = Try{cube.Copy(c), k}
-
-		v(cs[i].cube, false)
-
-		if cube.IsSolved(cs[i].cube) {
-			return solution + k + " "
-		}
-
-		i += 1
-	}
-
-	result := ""
-
-	for _, v := range cs {
-		res := solve(v.cube, solution+v.move+" ", lvl+1, maxDepth)
-
-		if res != "" {
-			result = res
-
-			return res
+func IDBFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool, maxDepth int, solution *[]string) {
+	for i := 0; i < maxDepth; i += 1 {
+		if DLS(c, g, s, i, solution) {
+			break
 		}
 	}
-
-	return result
 }
 
-func G0ToG1(c *cube.Cube, solution string, lvl int) string {
-	if lvl > 7 {
-		return ""
-	}
-
-	i, cs := 0, make([]Try, len(cube.NotationMatrix))
-
-	for k, v := range cube.NotationMatrix {
-		cs[i] = Try{cube.Copy(c), k}
-
-		v(cs[i].cube, false)
-
-		if cube.IsGoodEdges(cs[i].cube) {
-			return solution + k + " "
-		}
-
-		i += 1
-	}
-
-	result := ""
-
-	for _, v := range cs {
-		res := G0ToG1(v.cube, solution+v.move+" ", lvl+1)
-
-		if res != "" {
-			result = res
-
-			return res
+func DLS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool, depth int, solution *[]string) bool {
+	if depth <= 0 {
+		if s(c) {
+			return true
+		} else {
+			return false
 		}
 	}
 
-	return result
+	for k, v := range g {
+		*solution = append(*solution, k)
 
-}
-
-func G1ToG2(c *cube.Cube, solution string, lvl int) string {
-	if lvl > 10 {
-		return ""
-	}
-
-	i, cs := 0, make([]Try, len(cube.NotationMatrix1))
-
-	for k, v := range cube.NotationMatrix1 {
-		cs[i] = Try{cube.Copy(c), k}
-
-		v(cs[i].cube, false)
-
-		if cube.IsGoodCorners(cs[i].cube) {
-			return solution + k + " "
+		if DLS(v(cube.Copy(c)), g, s, depth-1, solution) {
+			return true
 		}
 
-		i += 1
+		*solution = (*solution)[:len(*solution)-1]
 	}
 
-	result := ""
-
-	for _, v := range cs {
-		res := G1ToG2(v.cube, solution+v.move+" ", lvl+1)
-
-		if res != "" {
-			result = res
-
-			return res
-		}
-	}
-
-	return result
-
-}
-
-func G2ToG3(c *cube.Cube, solution string, lvl int) string {
-	if lvl > 13 {
-		return ""
-	}
-
-	i, cs := 0, make([]Try, len(cube.NotationMatrix2))
-
-	for k, v := range cube.NotationMatrix2 {
-		cs[i] = Try{cube.Copy(c), k}
-
-		v(cs[i].cube, false)
-
-		if cube.IsGoodSides(cs[i].cube) {
-			return solution + k + " "
-		}
-
-		i += 1
-	}
-
-	result := ""
-
-	for _, v := range cs {
-		res := G2ToG3(v.cube, solution+v.move+" ", lvl+1)
-
-		if res != "" {
-			result = res
-
-			return res
-		}
-	}
-
-	return result
-
-}
-
-func G3ToG4(c *cube.Cube, solution string, lvl int) string {
-	if lvl > 10 {
-		return ""
-	}
-
-	i, cs := 0, make([]Try, len(cube.NotationMatrix3))
-
-	for k, v := range cube.NotationMatrix3 {
-		cs[i] = Try{cube.Copy(c), k}
-
-		v(cs[i].cube, false)
-
-		if cube.IsSolved(cs[i].cube) {
-			return solution + k + " "
-		}
-
-		i += 1
-	}
-
-	result := ""
-
-	for _, v := range cs {
-		res := G3ToG4(v.cube, solution+v.move+" ", lvl+1)
-
-		if res != "" {
-			result = res
-
-			return res
-		}
-	}
-
-	return result
-
-}
-
-func Solve(c *cube.Cube, maxDepth int) string {
-	result := strings.TrimRight(G0ToG1(c, "", 0), " ")
-
-	c = cube.ApplyMoves(c, strings.Split(result, " "), nil)
-
-	fmt.Println()
-	cube.Print(c)
-
-	result = strings.TrimRight(G1ToG2(c, "", 0), " ")
-
-	c = cube.ApplyMoves(c, strings.Split(result, " "), nil)
-
-	fmt.Println()
-	cube.Print(c)
-
-	result = strings.TrimRight(G2ToG3(c, "", 0), " ")
-
-	c = cube.ApplyMoves(c, strings.Split(result, " "), nil)
-
-	fmt.Println()
-	cube.Print(c)
-
-	result = strings.TrimRight(G3ToG4(c, "", 0), " ")
-
-	return result
+	return false
 }
