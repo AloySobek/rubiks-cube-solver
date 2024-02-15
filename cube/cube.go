@@ -292,3 +292,57 @@ func G2Condition(c *Cube) bool {
 func G3Condition(c *Cube) bool {
 	return Solved(c)
 }
+
+func GetEdgeOrientations(c *Cube) uint16 {
+	var result uint16 = 0
+
+	if ((c.S2&g1)>>8)&(S1|S3) > 0 {
+		result |= 1
+	}
+
+	if ((c.S2&g3)>>24)&(S1|S3) > 0 {
+		result |= 2
+	}
+
+	if ((c.S2&g5)>>40)&(S1|S3) > 0 {
+		result |= 4
+	}
+
+	if ((c.S2&g7)>>56)&(S1|S3) > 0 {
+		result |= 8
+	}
+
+	if ((c.S0&g3)>>24)&(S1|S3) > 0 {
+		result |= 16
+	}
+
+	if ((c.S0&g7)>>56)&(S1|S3) > 0 {
+		result |= 32
+	}
+
+	if ((c.S5&g3)>>24)&(S1|S3) > 0 {
+		result |= 64
+	}
+
+	if ((c.S5&g7)>>56)&(S1|S3) > 0 {
+		result |= 128
+	}
+
+	if ((c.S4&g1)>>8)&(S1|S3) > 0 {
+		result |= 256
+	}
+
+	if ((c.S4&g3)>>24)&(S1|S3) > 0 {
+		result |= 512
+	}
+
+	if ((c.S4&g5)>>40)&(S1|S3) > 0 {
+		result |= 1024
+	}
+
+	if ((c.S4&g7)>>56)&(S1|S3) > 0 {
+		result |= 2048
+	}
+
+	return result
+}

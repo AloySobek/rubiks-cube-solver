@@ -19,6 +19,8 @@ func Print(cube *Cube) {
 	putSide(buffer, cube.S5, 'Y', 8, 4)
 
 	render(buffer)
+
+	fmt.Printf("%012b\n", GetEdgeOrientations(cube))
 }
 
 func render(buffer [][]rune) {

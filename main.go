@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -43,6 +44,119 @@ func app(ctx *cli.Context) error {
 	return nil
 }
 
+func interactive(ctx *cli.Context) error {
+	c := cube.Create()
+
+	for reader := bufio.NewReader(os.Stdin); ; {
+		fmt.Printf("\033[0;0H")
+
+		cube.Print(c)
+
+		fmt.Print("Enter rotation: ")
+
+		input, err := reader.ReadString('\n')
+
+		if err != nil {
+			fmt.Printf("Error occurred while reading input: %s", err)
+		}
+
+		input = input[:len(input)-1]
+
+		if input == "quit" {
+			break
+		}
+
+		switch input {
+		case "U":
+			{
+				cube.RotateS0(c)
+			}
+		case "U2":
+			{
+				cube.RotateS0Twice(c)
+			}
+		case "U'":
+			{
+				cube.RotateS0Thrice(c)
+			}
+
+		case "D":
+			{
+				cube.RotateS5(c)
+			}
+		case "D2":
+			{
+				cube.RotateS5Twice(c)
+			}
+		case "D'":
+			{
+				cube.RotateS5Thrice(c)
+			}
+		case "R":
+			{
+				cube.RotateS3(c)
+			}
+		case "R2":
+			{
+				cube.RotateS3Twice(c)
+			}
+		case "R'":
+			{
+				cube.RotateS3Thrice(c)
+			}
+		case "L":
+			{
+				cube.RotateS1(c)
+			}
+		case "L2":
+			{
+				cube.RotateS1Twice(c)
+			}
+		case "L'":
+			{
+				cube.RotateS1Thrice(c)
+			}
+		case "F":
+			{
+				cube.RotateS2(c)
+			}
+		case "F2":
+			{
+				cube.RotateS2Twice(c)
+			}
+		case "F'":
+			{
+				cube.RotateS2Thrice(c)
+			}
+		case "B":
+			{
+				cube.RotateS4(c)
+			}
+		case "B2":
+			{
+				cube.RotateS4Twice(c)
+			}
+		case "B'":
+			{
+				cube.RotateS4Thrice(c)
+			}
+		default:
+			{
+				fmt.Printf("Unknown command\n")
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func gen(ctx *cli.Context) error {
+	algorithm.GenerateG0Table("./G0.txt")
+
+	return nil
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "Rubik",
@@ -54,7 +168,7 @@ func main() {
 				Usage: "n random generated moves",
 			},
 		},
-		Action: app,
+		Action: gen,
 	}
 
 	err := app.Run(os.Args)

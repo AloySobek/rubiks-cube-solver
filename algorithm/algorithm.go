@@ -5,26 +5,29 @@ import (
 	"github.com/AloySobek/Rubik/cube"
 )
 
+var global_variable uint64 = 0
+
 func Solve(c *cube.Cube) {
 	solution := append(make([]string, 0, 100), cube.ApplyMoves(c, IDBFS(c, cube.G0, cube.G0Condition))...)
 
 	fmt.Println(solution)
+	fmt.Println(global_variable)
 	cube.Print(c)
 
-	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G1, cube.G1Condition))...)
+	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G1, cube.G1Condition))...)
 
-	fmt.Println(solution)
-	cube.Print(c)
+	// fmt.Println(solution)
+	// cube.Print(c)
 
-	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G2, cube.G2Condition))...)
+	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G2, cube.G2Condition))...)
 
-	fmt.Println(solution)
-	cube.Print(c)
+	// fmt.Println(solution)
+	// cube.Print(c)
 
-	solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G3, cube.G3Condition))...)
+	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G3, cube.G3Condition))...)
 
-	fmt.Println(solution)
-	cube.Print(c)
+	// fmt.Println(solution)
+	// cube.Print(c)
 }
 
 func IDBFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool) []string {
@@ -43,6 +46,8 @@ func DLS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cu
 
 	for k, v := range g {
 		*solution = append(*solution, k)
+
+		global_variable += 1
 
 		if DLS(v(cube.Copy(c)), g, s, depth-1, solution) {
 			return true
