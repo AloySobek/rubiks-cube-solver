@@ -69,76 +69,76 @@ func interactive(ctx *cli.Context) error {
 		switch input {
 		case "U":
 			{
-				cube.RotateS0(c)
+				cube.Up(c)
 			}
 		case "U2":
 			{
-				cube.RotateS0Twice(c)
+				cube.Up2(c)
 			}
 		case "U'":
 			{
-				cube.RotateS0Thrice(c)
+				cube.UpPrime(c)
 			}
 
 		case "D":
 			{
-				cube.RotateS5(c)
+				cube.Down(c)
 			}
 		case "D2":
 			{
-				cube.RotateS5Twice(c)
+				cube.Down2(c)
 			}
 		case "D'":
 			{
-				cube.RotateS5Thrice(c)
+				cube.DownPrime(c)
 			}
 		case "R":
 			{
-				cube.RotateS3(c)
+				cube.Right(c)
 			}
 		case "R2":
 			{
-				cube.RotateS3Twice(c)
+				cube.Right2(c)
 			}
 		case "R'":
 			{
-				cube.RotateS3Thrice(c)
+				cube.RightPrime(c)
 			}
 		case "L":
 			{
-				cube.RotateS1(c)
+				cube.Left(c)
 			}
 		case "L2":
 			{
-				cube.RotateS1Twice(c)
+				cube.Left2(c)
 			}
 		case "L'":
 			{
-				cube.RotateS1Thrice(c)
+				cube.LeftPrime(c)
 			}
 		case "F":
 			{
-				cube.RotateS2(c)
+				cube.Front(c)
 			}
 		case "F2":
 			{
-				cube.RotateS2Twice(c)
+				cube.Front2(c)
 			}
 		case "F'":
 			{
-				cube.RotateS2Thrice(c)
+				cube.FrontPrime(c)
 			}
 		case "B":
 			{
-				cube.RotateS4(c)
+				cube.Back(c)
 			}
 		case "B2":
 			{
-				cube.RotateS4Twice(c)
+				cube.Back2(c)
 			}
 		case "B'":
 			{
-				cube.RotateS4Thrice(c)
+				cube.BackPrime(c)
 			}
 		default:
 			{
@@ -152,7 +152,13 @@ func interactive(ctx *cli.Context) error {
 }
 
 func gen(ctx *cli.Context) error {
-	algorithm.GenerateG0Table("./G0.txt")
+	algorithm.WriteDataToFile("G0.table", algorithm.GenerateG0Table())
+
+	table := algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table"))
+
+	for i, v := range table {
+		fmt.Printf("%d: %s\n", i, v)
+	}
 
 	return nil
 }
@@ -177,106 +183,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-// Interactive mode
-// c = cube.Create()
-
-// for reader := bufio.NewReader(os.Stdin); ; {
-// 	fmt.Printf("\033[0;0H")
-
-// 	cube.Print(c)
-
-// 	fmt.Print("Enter rotation: ")
-
-// 	input, err := reader.ReadString('\n')
-
-// 	if err != nil {
-// 		fmt.Printf("Error occurred while reading input: %s", err)
-// 	}
-
-// 	input = input[:len(input)-1]
-
-// 	if input == "quit" {
-// 		break
-// 	}
-
-// 	switch input {
-// 	case "U":
-// 		{
-// 			cube.Up(c, false, false)
-// 		}
-// 	case "U'":
-// 		{
-// 			cube.Up(c, true, false)
-// 		}
-// 	case "U2":
-// 		{
-// 			cube.Up(c, false, true)
-// 		}
-// 	case "D":
-// 		{
-// 			cube.Down(c, false, false)
-// 		}
-// 	case "D'":
-// 		{
-// 			cube.Down(c, true, false)
-// 		}
-// 	case "D2":
-// 		{
-// 			cube.Down(c, false, true)
-// 		}
-// 	case "R":
-// 		{
-// 			cube.Right(c, false, false)
-// 		}
-// 	case "R'":
-// 		{
-// 			cube.Right(c, true, false)
-// 		}
-// 	case "R2":
-// 		{
-// 			cube.Right(c, false, true)
-// 		}
-// 	case "L":
-// 		{
-// 			cube.Left(c, false, false)
-// 		}
-// 	case "L'":
-// 		{
-// 			cube.Left(c, true, false)
-// 		}
-// 	case "L2":
-// 		{
-// 			cube.Left(c, false, true)
-// 		}
-// 	case "F":
-// 		{
-// 			cube.Front(c, false, false)
-// 		}
-// 	case "F'":
-// 		{
-// 			cube.Front(c, true, false)
-// 		}
-// 	case "F2":
-// 		{
-// 			cube.Front(c, false, true)
-// 		}
-// 	case "B":
-// 		{
-// 			cube.Back(c, false, false)
-// 		}
-// 	case "B'":
-// 		{
-// 			cube.Back(c, true, false)
-// 		}
-// 	case "B2":
-// 		{
-// 			cube.Back(c, false, true)
-// 		}
-// 	default:
-// 		{
-// 			fmt.Printf("Unknown command\n")
-// 		}
-// 	}
-
-// }

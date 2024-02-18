@@ -7,111 +7,51 @@ import (
 )
 
 const (
-	S0 = uint64(1)
-	S1 = uint64(2)
-	S2 = uint64(4)
-	S3 = uint64(8)
-	S4 = uint64(16)
-	S5 = uint64(32)
+	U = uint64(1)
+	L = uint64(2)
+	F = uint64(4)
+	R = uint64(8)
+	B = uint64(16)
+	D = uint64(32)
 )
 
 const (
-	SolS0 = uint64(0) | S0 | (S0 << 8) | (S0 << 16) | (S0 << 24) | (S0 << 32) | (S0 << 40) | (S0 << 48) | (S0 << 56)
-	SolS1 = uint64(0) | S1 | (S1 << 8) | (S1 << 16) | (S1 << 24) | (S1 << 32) | (S1 << 40) | (S1 << 48) | (S1 << 56)
-	SolS2 = uint64(0) | S2 | (S2 << 8) | (S2 << 16) | (S2 << 24) | (S2 << 32) | (S2 << 40) | (S2 << 48) | (S2 << 56)
-	SolS3 = uint64(0) | S3 | (S3 << 8) | (S3 << 16) | (S3 << 24) | (S3 << 32) | (S3 << 40) | (S3 << 48) | (S3 << 56)
-	SolS4 = uint64(0) | S4 | (S4 << 8) | (S4 << 16) | (S4 << 24) | (S4 << 32) | (S4 << 40) | (S4 << 48) | (S4 << 56)
-	SolS5 = uint64(0) | S5 | (S5 << 8) | (S5 << 16) | (S5 << 24) | (S5 << 32) | (S5 << 40) | (S5 << 48) | (S5 << 56)
+	SU = uint64(0) | U | (U << 8) | (U << 16) | (U << 24) | (U << 32) | (U << 40) | (U << 48) | (U << 56)
+	SL = uint64(0) | L | (L << 8) | (L << 16) | (L << 24) | (L << 32) | (L << 40) | (L << 48) | (L << 56)
+	SF = uint64(0) | F | (F << 8) | (F << 16) | (F << 24) | (F << 32) | (F << 40) | (F << 48) | (F << 56)
+	SR = uint64(0) | R | (R << 8) | (R << 16) | (R << 24) | (R << 32) | (R << 40) | (R << 48) | (R << 56)
+	SB = uint64(0) | B | (B << 8) | (B << 16) | (B << 24) | (B << 32) | (B << 40) | (B << 48) | (B << 56)
+	SD = uint64(0) | D | (D << 8) | (D << 16) | (D << 24) | (D << 32) | (D << 40) | (D << 48) | (D << 56)
 )
 
 type Cube struct {
-	S0 uint64
-	S1 uint64
-	S2 uint64
-	S3 uint64
-	S4 uint64
-	S5 uint64
-}
-
-var G0 map[string]func(*Cube) *Cube = map[string]func(*Cube) *Cube{
-	"F":  RotateS2,
-	"B":  RotateS4,
-	"R":  RotateS3,
-	"L":  RotateS1,
-	"U":  RotateS0,
-	"D":  RotateS5,
-	"F'": RotateS2Thrice,
-	"B'": RotateS4Thrice,
-	"R'": RotateS3Thrice,
-	"L'": RotateS1Thrice,
-	"U'": RotateS0Thrice,
-	"D'": RotateS5Thrice,
-	"F2": RotateS2Twice,
-	"B2": RotateS4Twice,
-	"R2": RotateS3Twice,
-	"L2": RotateS1Twice,
-	"U2": RotateS0Twice,
-	"D2": RotateS5Twice,
-}
-
-var G1 map[string]func(*Cube) *Cube = map[string]func(*Cube) *Cube{
-	"F":  RotateS2,
-	"B":  RotateS4,
-	"R":  RotateS3,
-	"L":  RotateS1,
-	"F'": RotateS2Thrice,
-	"B'": RotateS4Thrice,
-	"R'": RotateS3Thrice,
-	"L'": RotateS1Thrice,
-	"F2": RotateS2Twice,
-	"B2": RotateS4Twice,
-	"R2": RotateS3Twice,
-	"L2": RotateS1Twice,
-	"U2": RotateS0Twice,
-	"D2": RotateS5Twice,
-}
-
-var G2 map[string]func(*Cube) *Cube = map[string]func(*Cube) *Cube{
-	"R":  RotateS3,
-	"L":  RotateS1,
-	"R'": RotateS3Thrice,
-	"L'": RotateS1Thrice,
-	"F2": RotateS2Twice,
-	"B2": RotateS4Twice,
-	"R2": RotateS3Twice,
-	"L2": RotateS1Twice,
-	"U2": RotateS0Twice,
-	"D2": RotateS5Twice,
-}
-
-var G3 map[string]func(*Cube) *Cube = map[string]func(*Cube) *Cube{
-	"F2": RotateS2Twice,
-	"B2": RotateS4Twice,
-	"R2": RotateS3Twice,
-	"L2": RotateS1Twice,
-	"U2": RotateS0Twice,
-	"D2": RotateS5Twice,
+	U uint64
+	L uint64
+	F uint64
+	R uint64
+	B uint64
+	D uint64
 }
 
 func Create() *Cube {
 	return &Cube{
-		S0: SolS0,
-		S1: SolS1,
-		S2: SolS2,
-		S3: SolS3,
-		S4: SolS4,
-		S5: SolS5,
+		U: SU,
+		L: SL,
+		F: SF,
+		R: SR,
+		B: SB,
+		D: SD,
 	}
 }
 
 func Copy(c *Cube) *Cube {
 	return &Cube{
-		S0: c.S0,
-		S1: c.S1,
-		S2: c.S2,
-		S3: c.S3,
-		S4: c.S4,
-		S5: c.S5,
+		U: c.U,
+		L: c.L,
+		F: c.F,
+		R: c.R,
+		B: c.B,
+		D: c.D,
 	}
 }
 
@@ -143,35 +83,35 @@ func ApplyMoves(cube *Cube, sequence []string) []string {
 }
 
 func Solved(c *Cube) bool {
-	return c.S0 == SolS0 && c.S1 == SolS1 &&
-		c.S2 == SolS2 && c.S3 == SolS3 &&
-		c.S4 == SolS4 && c.S5 == SolS5
+	return c.U == SU && c.L == SL &&
+		c.F == SF && c.R == SR &&
+		c.B == SB && c.D == SD
 }
 
 func G0Condition(c *Cube) bool {
-	var bad uint64 = S1 | S3
+	var bad uint64 = L | R
 
-	if ((c.S2&g1)>>8)&bad > 0 ||
-		((c.S2&g3)>>24)&bad > 0 ||
-		((c.S2&g5)>>40)&bad > 0 ||
-		((c.S2&g7)>>56)&bad > 0 {
+	if ((c.F&g1)>>8)&bad > 0 ||
+		((c.F&g3)>>24)&bad > 0 ||
+		((c.F&g5)>>40)&bad > 0 ||
+		((c.F&g7)>>56)&bad > 0 {
 		return false
 	}
 
-	if ((c.S4&g1)>>8)&bad > 0 ||
-		((c.S4&g3)>>24)&bad > 0 ||
-		((c.S4&g5)>>40)&bad > 0 ||
-		((c.S4&g7)>>56)&bad > 0 {
+	if ((c.B&g1)>>8)&bad > 0 ||
+		((c.B&g3)>>24)&bad > 0 ||
+		((c.B&g5)>>40)&bad > 0 ||
+		((c.B&g7)>>56)&bad > 0 {
 		return false
 	}
 
-	if ((c.S0&g3)>>24)&bad > 0 ||
-		((c.S0&g7)>>56)&bad > 0 {
+	if ((c.U&g3)>>24)&bad > 0 ||
+		((c.U&g7)>>56)&bad > 0 {
 		return false
 	}
 
-	if ((c.S5&g3)>>24)&bad > 0 ||
-		((c.S5&g7)>>56)&bad > 0 {
+	if ((c.D&g3)>>24)&bad > 0 ||
+		((c.D&g7)>>56)&bad > 0 {
 		return false
 	}
 
@@ -179,40 +119,40 @@ func G0Condition(c *Cube) bool {
 }
 
 func G1Condition(c *Cube) bool {
-	var good uint64 = S1 | S3
-	var edges uint64 = S5 | S0 | S2 | S4
+	var good uint64 = L | R
+	var edges uint64 = D | U | F | B
 
-	if ((c.S0&g1)>>8)&edges == 0 ||
-		((c.S0&g5)>>40)&edges == 0 {
+	if ((c.U&g1)>>8)&edges == 0 ||
+		((c.U&g5)>>40)&edges == 0 {
 		return false
 	}
 
-	if ((c.S2&g1)>>8)&edges == 0 ||
-		((c.S2&g5)>>40)&edges == 0 {
+	if ((c.F&g1)>>8)&edges == 0 ||
+		((c.F&g5)>>40)&edges == 0 {
 		return false
 	}
 
-	if ((c.S4&g1)>>8)&edges == 0 ||
-		((c.S4&g5)>>40)&edges == 0 {
+	if ((c.B&g1)>>8)&edges == 0 ||
+		((c.B&g5)>>40)&edges == 0 {
 		return false
 	}
 
-	if ((c.S5&g1)>>8)&edges == 0 ||
-		((c.S5&g5)>>40)&edges == 0 {
+	if ((c.D&g1)>>8)&edges == 0 ||
+		((c.D&g5)>>40)&edges == 0 {
 		return false
 	}
 
-	if (c.S1&g0)&good == 0 ||
-		((c.S1&g2)>>16)&good == 0 ||
-		((c.S1&g4)>>32)&good == 0 ||
-		((c.S1&g6)>>48)&good == 0 {
+	if (c.L&g0)&good == 0 ||
+		((c.L&g2)>>16)&good == 0 ||
+		((c.L&g4)>>32)&good == 0 ||
+		((c.L&g6)>>48)&good == 0 {
 		return false
 	}
 
-	if (c.S3&g0)&good == 0 ||
-		((c.S3&g2)>>16)&good == 0 ||
-		((c.S3&g4)>>32)&good == 0 ||
-		((c.S3&g6)>>48)&good == 0 {
+	if (c.R&g0)&good == 0 ||
+		((c.R&g2)>>16)&good == 0 ||
+		((c.R&g4)>>32)&good == 0 ||
+		((c.R&g6)>>48)&good == 0 {
 		return false
 	}
 
@@ -220,69 +160,69 @@ func G1Condition(c *Cube) bool {
 }
 
 func G2Condition(c *Cube) bool {
-	if (c.S0&g0)&(S0|S5) == 0 ||
-		((c.S0&g1)>>8)&(S0|S5) == 0 ||
-		((c.S0&g2)>>16)&(S0|S5) == 0 ||
-		((c.S0&g3)>>24)&(S0|S5) == 0 ||
-		((c.S0&g4)>>32)&(S0|S5) == 0 ||
-		((c.S0&g5)>>40)&(S0|S5) == 0 ||
-		((c.S0&g6)>>48)&(S0|S5) == 0 ||
-		((c.S0&g7)>>56)&(S0|S5) == 0 {
+	if (c.U&g0)&(U|D) == 0 ||
+		((c.U&g1)>>8)&(U|D) == 0 ||
+		((c.U&g2)>>16)&(U|D) == 0 ||
+		((c.U&g3)>>24)&(U|D) == 0 ||
+		((c.U&g4)>>32)&(U|D) == 0 ||
+		((c.U&g5)>>40)&(U|D) == 0 ||
+		((c.U&g6)>>48)&(U|D) == 0 ||
+		((c.U&g7)>>56)&(U|D) == 0 {
 		return false
 	}
 
-	if (c.S5&g0)&(S0|S5) == 0 ||
-		((c.S5&g1)>>8)&(S0|S5) == 0 ||
-		((c.S5&g2)>>16)&(S0|S5) == 0 ||
-		((c.S5&g3)>>24)&(S0|S5) == 0 ||
-		((c.S5&g4)>>32)&(S0|S5) == 0 ||
-		((c.S5&g5)>>40)&(S0|S5) == 0 ||
-		((c.S5&g6)>>48)&(S0|S5) == 0 ||
-		((c.S5&g7)>>56)&(S0|S5) == 0 {
+	if (c.D&g0)&(U|D) == 0 ||
+		((c.D&g1)>>8)&(U|D) == 0 ||
+		((c.D&g2)>>16)&(U|D) == 0 ||
+		((c.D&g3)>>24)&(U|D) == 0 ||
+		((c.D&g4)>>32)&(U|D) == 0 ||
+		((c.D&g5)>>40)&(U|D) == 0 ||
+		((c.D&g6)>>48)&(U|D) == 0 ||
+		((c.D&g7)>>56)&(U|D) == 0 {
 		return false
 	}
 
-	if (c.S4&g0)&(S4|S2) == 0 ||
-		((c.S4&g1)>>8)&(S4|S2) == 0 ||
-		((c.S4&g2)>>16)&(S4|S2) == 0 ||
-		((c.S4&g3)>>24)&(S4|S2) == 0 ||
-		((c.S4&g4)>>32)&(S4|S2) == 0 ||
-		((c.S4&g5)>>40)&(S4|S2) == 0 ||
-		((c.S4&g6)>>48)&(S4|S2) == 0 ||
-		((c.S4&g7)>>56)&(S4|S2) == 0 {
+	if (c.B&g0)&(B|F) == 0 ||
+		((c.B&g1)>>8)&(B|F) == 0 ||
+		((c.B&g2)>>16)&(B|F) == 0 ||
+		((c.B&g3)>>24)&(B|F) == 0 ||
+		((c.B&g4)>>32)&(B|F) == 0 ||
+		((c.B&g5)>>40)&(B|F) == 0 ||
+		((c.B&g6)>>48)&(B|F) == 0 ||
+		((c.B&g7)>>56)&(B|F) == 0 {
 		return false
 	}
 
-	if (c.S2&g0)&(S4|S2) == 0 ||
-		((c.S2&g1)>>8)&(S4|S2) == 0 ||
-		((c.S2&g2)>>16)&(S4|S2) == 0 ||
-		((c.S2&g3)>>24)&(S4|S2) == 0 ||
-		((c.S2&g4)>>32)&(S4|S2) == 0 ||
-		((c.S2&g5)>>40)&(S4|S2) == 0 ||
-		((c.S2&g6)>>48)&(S4|S2) == 0 ||
-		((c.S2&g7)>>56)&(S4|S2) == 0 {
+	if (c.F&g0)&(B|F) == 0 ||
+		((c.F&g1)>>8)&(B|F) == 0 ||
+		((c.F&g2)>>16)&(B|F) == 0 ||
+		((c.F&g3)>>24)&(B|F) == 0 ||
+		((c.F&g4)>>32)&(B|F) == 0 ||
+		((c.F&g5)>>40)&(B|F) == 0 ||
+		((c.F&g6)>>48)&(B|F) == 0 ||
+		((c.F&g7)>>56)&(B|F) == 0 {
 		return false
 	}
 
-	if (c.S1&g0)&(S1|S3) == 0 ||
-		((c.S1&g1)>>8)&(S1|S3) == 0 ||
-		((c.S1&g2)>>16)&(S1|S3) == 0 ||
-		((c.S1&g3)>>24)&(S1|S3) == 0 ||
-		((c.S1&g4)>>32)&(S1|S3) == 0 ||
-		((c.S1&g5)>>40)&(S1|S3) == 0 ||
-		((c.S1&g6)>>48)&(S1|S3) == 0 ||
-		((c.S1&g7)>>56)&(S1|S3) == 0 {
+	if (c.L&g0)&(L|R) == 0 ||
+		((c.L&g1)>>8)&(L|R) == 0 ||
+		((c.L&g2)>>16)&(L|R) == 0 ||
+		((c.L&g3)>>24)&(L|R) == 0 ||
+		((c.L&g4)>>32)&(L|R) == 0 ||
+		((c.L&g5)>>40)&(L|R) == 0 ||
+		((c.L&g6)>>48)&(L|R) == 0 ||
+		((c.L&g7)>>56)&(L|R) == 0 {
 		return false
 	}
 
-	if (c.S3&g0)&(S1|S3) == 0 ||
-		((c.S3&g1)>>8)&(S1|S3) == 0 ||
-		((c.S3&g2)>>16)&(S1|S3) == 0 ||
-		((c.S3&g3)>>24)&(S1|S3) == 0 ||
-		((c.S3&g4)>>32)&(S1|S3) == 0 ||
-		((c.S3&g5)>>40)&(S1|S3) == 0 ||
-		((c.S3&g6)>>48)&(S1|S3) == 0 ||
-		((c.S3&g7)>>56)&(S1|S3) == 0 {
+	if (c.R&g0)&(L|R) == 0 ||
+		((c.R&g1)>>8)&(L|R) == 0 ||
+		((c.R&g2)>>16)&(L|R) == 0 ||
+		((c.R&g3)>>24)&(L|R) == 0 ||
+		((c.R&g4)>>32)&(L|R) == 0 ||
+		((c.R&g5)>>40)&(L|R) == 0 ||
+		((c.R&g6)>>48)&(L|R) == 0 ||
+		((c.R&g7)>>56)&(L|R) == 0 {
 		return false
 	}
 
@@ -296,51 +236,51 @@ func G3Condition(c *Cube) bool {
 func GetEdgeOrientations(c *Cube) uint16 {
 	var result uint16 = 0
 
-	if ((c.S2&g1)>>8)&(S1|S3) > 0 {
+	if ((c.F&g1)>>8)&(L|R) > 0 {
 		result |= 1
 	}
 
-	if ((c.S2&g3)>>24)&(S1|S3) > 0 {
+	if ((c.F&g3)>>24)&(L|R) > 0 {
 		result |= 2
 	}
 
-	if ((c.S2&g5)>>40)&(S1|S3) > 0 {
+	if ((c.F&g5)>>40)&(L|R) > 0 {
 		result |= 4
 	}
 
-	if ((c.S2&g7)>>56)&(S1|S3) > 0 {
+	if ((c.F&g7)>>56)&(L|R) > 0 {
 		result |= 8
 	}
 
-	if ((c.S0&g3)>>24)&(S1|S3) > 0 {
+	if ((c.U&g3)>>24)&(L|R) > 0 {
 		result |= 16
 	}
 
-	if ((c.S0&g7)>>56)&(S1|S3) > 0 {
+	if ((c.U&g7)>>56)&(L|R) > 0 {
 		result |= 32
 	}
 
-	if ((c.S5&g3)>>24)&(S1|S3) > 0 {
+	if ((c.D&g3)>>24)&(L|R) > 0 {
 		result |= 64
 	}
 
-	if ((c.S5&g7)>>56)&(S1|S3) > 0 {
+	if ((c.D&g7)>>56)&(L|R) > 0 {
 		result |= 128
 	}
 
-	if ((c.S4&g1)>>8)&(S1|S3) > 0 {
+	if ((c.B&g1)>>8)&(L|R) > 0 {
 		result |= 256
 	}
 
-	if ((c.S4&g3)>>24)&(S1|S3) > 0 {
+	if ((c.B&g3)>>24)&(L|R) > 0 {
 		result |= 512
 	}
 
-	if ((c.S4&g5)>>40)&(S1|S3) > 0 {
+	if ((c.B&g5)>>40)&(L|R) > 0 {
 		result |= 1024
 	}
 
-	if ((c.S4&g7)>>56)&(S1|S3) > 0 {
+	if ((c.B&g7)>>56)&(L|R) > 0 {
 		result |= 2048
 	}
 

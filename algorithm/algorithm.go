@@ -5,13 +5,15 @@ import (
 	"github.com/AloySobek/Rubik/cube"
 )
 
-var global_variable uint64 = 0
+type Node struct {
+	c *cube.Cube
+	s []string
+}
 
 func Solve(c *cube.Cube) {
 	solution := append(make([]string, 0, 100), cube.ApplyMoves(c, IDBFS(c, cube.G0, cube.G0Condition))...)
 
 	fmt.Println(solution)
-	fmt.Println(global_variable)
 	cube.Print(c)
 
 	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G1, cube.G1Condition))...)
@@ -30,6 +32,14 @@ func Solve(c *cube.Cube) {
 	// cube.Print(c)
 }
 
+func IDAStar(c *cube.Cube) {
+
+}
+
+func search(path *[]Node) {
+
+}
+
 func IDBFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool) []string {
 	solution := make([]string, 0, 64)
 
@@ -46,8 +56,6 @@ func DLS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cu
 
 	for k, v := range g {
 		*solution = append(*solution, k)
-
-		global_variable += 1
 
 		if DLS(v(cube.Copy(c)), g, s, depth-1, solution) {
 			return true

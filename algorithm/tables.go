@@ -1,18 +1,17 @@
 package algorithm
 
 import (
-	// "bytes"
-	// "encoding/gob"
-	"fmt"
+	"bytes"
+	"encoding/gob"
+	"io"
 	"os"
-	"sort"
 	"strings"
 
 	"github.com/AloySobek/Rubik/cube"
 )
 
-func GenerateG0Table(filepath string) {
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0644)
+func WriteDataToFile(filepath string, data *bytes.Buffer) {
+	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0644)
 
 	if err != nil {
 		panic(err)
@@ -20,63 +19,102 @@ func GenerateG0Table(filepath string) {
 
 	defer file.Close()
 
-	table := make([]string, 4097)
-
-	c := cube.Create()
-
-	BFS(c, cube.G0, table, 0, "")
-
-	sort.Strings(table)
-
-	for i, v := range table {
-		if v != "" {
-			fmt.Printf("%d: %s\n", i, v)
-		}
+	if _, err := file.Write(data.Bytes()); err != nil {
+		panic(err)
 	}
 }
 
-func BFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, table []string, depth int, solution string) {
-	if depth > 6 {
-		return
+func ReadDataFromFile(filepath string) *bytes.Buffer {
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0644)
+
+	if err != nil {
+		panic(err)
 	}
 
-	i, cs := 0, make([]struct {
-		cube *cube.Cube
-		move string
-	}, len(g))
+	defer file.Close()
 
-	for k, v := range g {
-		cs[i] = struct {
-			cube *cube.Cube
-			move string
-		}{cube.Copy(c), k}
+	buffer := bytes.NewBuffer([]byte{})
 
-		v(cs[i].cube)
+	io.Copy(buffer, file)
 
-		index := cube.GetEdgeOrientations(cs[i].cube)
+	return buffer
+}
 
-		if index != 0 && (table[index] == "" || len(strings.Split(table[index], " ")) > len(strings.Split(solution+k+" ", " "))) {
-			table[index] = solution + k + " "
+func GenerateG0Table() *bytes.Buffer {
+	const size = 4096 + 1
+
+	table := make([]string, size)
+
+	for i := range table {
+		table[i] = ""
+	}
+
+	c := cube.Create()
+
+	BFS(c, cube.G0, table)
+
+	buffer := bytes.NewBuffer([]byte{})
+
+	encoder := gob.NewEncoder(buffer)
+
+	if err := encoder.Encode(table); err != nil {
+		panic(err)
+	}
+
+	return buffer
+}
+
+func ReadG0Table(data *bytes.Buffer) []string {
+	const size = 4096 + 1
+
+	table := make([]string, size)
+
+	for i := range table {
+		table[i] = ""
+	}
+
+	decoder := gob.NewDecoder(data)
+
+	decoder.Decode(&table)
+
+	return table
+}
+
+func BFS(root *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, table []string) {
+	queue := make([]struct {
+		c *cube.Cube
+		m string
+		l uint64
+	}, 0)
+
+	queue = append(queue, struct {
+		c *cube.Cube
+		m string
+		l uint64
+	}{root, "", 0})
+
+	for len(queue) > 0 {
+		c := queue[0]
+
+		queue = queue[1:]
+
+		index := cube.GetEdgeOrientations(c.c)
+
+		if index != 0 && (table[index] == "") {
+			table[index] = strings.TrimSpace(c.m)
 		}
 
-		i += 1
-	}
-
-	for _, v := range cs {
-		BFS(v.cube, g, table, depth+1, solution+v.move+" ")
+		if c.l < 7 {
+			for k, v := range g {
+				queue = append(queue, struct {
+					c *cube.Cube
+					m string
+					l uint64
+				}{v(cube.Copy(c.c)), c.m + k + " ", c.l + 1})
+			}
+		}
 	}
 }
 
 // var table [2048]string
 //
-// 	buffer := new(bytes.Buffer)
-//
-// 	encoder := gob.NewEncoder(buffer)
-//
-// 	if err = encoder.Encode(table); err != nil {
-// 		panic(err)
-// 	}
-//
-// 	if _, err = file.Write(buffer.Bytes()); err != nil {
-// 		panic(err)
-// 	}
