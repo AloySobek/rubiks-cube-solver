@@ -3,41 +3,29 @@ package algorithm
 import (
 	"bytes"
 	"encoding/gob"
-	"io"
-	"os"
 	"strings"
 
 	"github.com/AloySobek/Rubik/cube"
 )
 
-func WriteDataToFile(filepath string, data *bytes.Buffer) {
-	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0644)
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-
-	if _, err := file.Write(data.Bytes()); err != nil {
-		panic(err)
-	}
+type Tables struct {
+	G0 []string
 }
 
-func ReadDataFromFile(filepath string) *bytes.Buffer {
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0644)
+func ReadG0Table(data *bytes.Buffer) []string {
+	const size = 4096 + 1
 
-	if err != nil {
-		panic(err)
+	table := make([]string, size)
+
+	for i := range table {
+		table[i] = ""
 	}
 
-	defer file.Close()
+	decoder := gob.NewDecoder(data)
 
-	buffer := bytes.NewBuffer([]byte{})
+	decoder.Decode(&table)
 
-	io.Copy(buffer, file)
-
-	return buffer
+	return table
 }
 
 func GenerateG0Table() *bytes.Buffer {
@@ -64,22 +52,6 @@ func GenerateG0Table() *bytes.Buffer {
 	return buffer
 }
 
-func ReadG0Table(data *bytes.Buffer) []string {
-	const size = 4096 + 1
-
-	table := make([]string, size)
-
-	for i := range table {
-		table[i] = ""
-	}
-
-	decoder := gob.NewDecoder(data)
-
-	decoder.Decode(&table)
-
-	return table
-}
-
 func BFS(root *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, table []string) {
 	queue := make([]struct {
 		c *cube.Cube
@@ -100,7 +72,7 @@ func BFS(root *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, table []stri
 
 		index := cube.GetEdgeOrientations(c.c)
 
-		if index != 0 && (table[index] == "") {
+		if index != 0 && table[index] == "" {
 			table[index] = strings.TrimSpace(c.m)
 		}
 
@@ -116,5 +88,8 @@ func BFS(root *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, table []stri
 	}
 }
 
-// var table [2048]string
-//
+func GetTables() *Tables {
+	return &Tables{
+		ReadG0Table(ReadDataFromFile("G0.table")),
+	}
+}
