@@ -1,10 +1,8 @@
 package algorithm
 
 import (
-	"fmt"
 	"github.com/AloySobek/Rubik/cube"
 	"math"
-	"strings"
 )
 
 type Node struct {
@@ -12,17 +10,7 @@ type Node struct {
 	p string
 }
 
-func heuristic(n *Node, tables *Tables) int {
-	index := cube.GetEdgeOrientations(n.c)
-
-	if index == 0 {
-		return 0
-	}
-
-	return len(strings.Split(tables.G0[index], " "))
-}
-
-func Solve(c *cube.Cube, tables *Tables) {
+func Solve(c *cube.Cube) {
 	root := &Node{
 		c,
 		"",
@@ -31,12 +19,11 @@ func Solve(c *cube.Cube, tables *Tables) {
 	solved := IDAStar(
 		root,
 		cube.G0,
-		func(n *Node) int { return heuristic(n, tables) },
+		func(n *Node) int { return 0 },
 		func(n *Node) bool { return cube.G0Condition(n.c) },
 	)
 
 	cube.Print(solved.c)
-	fmt.Printf("Path: %s : %d : %t\n", solved.p, heuristic(solved, tables), cube.G0Condition(solved.c))
 }
 
 func IDAStar(

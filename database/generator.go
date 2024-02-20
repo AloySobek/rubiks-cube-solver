@@ -1,12 +1,14 @@
 package database
 
 import (
+	"bytes"
+	"encoding/gob"
 	"github.com/AloySobek/Rubik/model"
 	"github.com/AloySobek/Rubik/solver"
 	"strings"
 )
 
-func BFS(root *model.Cube, g map[string]func(*model.Cube) *model.Cube, table []string, i func(c *model.Cube) uint16) {
+func BFS(root *model.Cube, g map[string]func(*model.Cube) *model.Cube, table map[uint16]string, i func(c *model.Cube) uint16) {
 	queue := make([]struct {
 		c *model.Cube
 		m string
@@ -31,7 +33,7 @@ func BFS(root *model.Cube, g map[string]func(*model.Cube) *model.Cube, table []s
 
 			index := i(cc.c)
 
-			if table[index] == "" {
+			if _, ok := table[index]; !ok {
 				table[index] = strings.TrimSpace(cc.m)
 
 				queue = append(queue, cc)
@@ -41,14 +43,8 @@ func BFS(root *model.Cube, g map[string]func(*model.Cube) *model.Cube, table []s
 	}
 }
 
-func GenerateG0() []string {
-	const size = 4096 + 1
-
-	table := make([]string, size)
-
-	for i := range table {
-		table[i] = ""
-	}
+func GenerateG0() map[uint16]string {
+	table := make(map[uint16]string, 0)
 
 	c := model.Create(nil)
 
@@ -65,4 +61,16 @@ func GenerateG0() []string {
 	})
 
 	return table
+}
+
+func G0ToBytes(table map[uint16]string) *bytes.Buffer {
+	buffer := bytes.NewBuffer([]byte{})
+
+	encoder := gob.NewEncoder(buffer)
+
+	if err := encoder.Encode(table); err != nil {
+		panic(err)
+	}
+
+	return buffer
 }

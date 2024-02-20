@@ -34,7 +34,7 @@ func GetRandomMixSequence(n int) (sequence string) {
 	return
 }
 
-func app(ctx *cli.Context) error {
+func solve(ctx *cli.Context) error {
 	sequence := ctx.Args().Get(0)
 
 	if sequence == "" {
@@ -55,11 +55,7 @@ func app(ctx *cli.Context) error {
 
 	start := time.Now()
 
-	tables := algorithm.Tables{
-		G0: algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table")),
-	}
-
-	algorithm.Solve(c, &tables)
+	algorithm.Solve(c)
 
 	elapsed := time.Since(start)
 
@@ -72,8 +68,6 @@ func interactive(ctx *cli.Context) error {
 	c := model.Create(nil)
 
 	for reader := bufio.NewReader(os.Stdin); ; {
-		fmt.Printf("\033[2J")
-
 		render.Render(c)
 
 		fmt.Print("Enter rotation: ")
@@ -98,23 +92,32 @@ func interactive(ctx *cli.Context) error {
 	return nil
 }
 
-func gen(ctx *cli.Context) error {
-	i := 0
+func dbGen(ctx *cli.Context) error {
+	fmt.Println("Generating pattern databases...")
 
-	for _, v := range database.GenerateG0() {
-		if v != "" {
-			fmt.Printf("%d: %s\n", i, v)
-
-			i += 1
-		}
-
+	if _, err := os.Stat("./assets"); os.IsNotExist(err) {
+		os.Mkdir("./assets", 0777)
 	}
 
-	// algorithm.WriteDataToFile(algorithm.GenerateG0Table(), "G0.table")
+	fmt.Println("Generating G0...")
 
-	// table := algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table"))
+	database.WriteDataToFile(database.G0ToBytes(database.GenerateG0()), "assets/G0.table")
+
+	fmt.Println("G0 done")
+
+	fmt.Println("Pattern databases has been successfully generated")
 
 	return nil
+}
+
+func application(ctx *cli.Context) error {
+	if ctx.Bool("db") {
+		return dbGen(ctx)
+	} else if ctx.Bool("i") {
+		return interactive(ctx)
+	}
+
+	return solve(ctx)
 }
 
 func main() {
@@ -122,13 +125,23 @@ func main() {
 		Name:  "Rubik",
 		Usage: "Rubik's cube solver",
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "db",
+				Value: false,
+				Usage: "Generate pattern databases only",
+			},
+			&cli.BoolFlag{
+				Name:  "i",
+				Value: false,
+				Usage: "Interactive mode",
+			},
 			&cli.IntFlag{
 				Name:  "n",
-				Value: 1,
+				Value: 100,
 				Usage: "n random generated moves",
 			},
 		},
-		Action: gen,
+		Action: application,
 	}
 
 	err := app.Run(os.Args)
