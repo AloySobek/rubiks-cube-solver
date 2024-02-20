@@ -1,78 +1,105 @@
 package algorithm
 
 import (
+	"fmt"
 	"github.com/AloySobek/Rubik/cube"
+	"math"
 	"strings"
 )
 
 type Node struct {
 	c *cube.Cube
-	p *[]string
+	p string
 }
 
-func heuristic(n Node, tables *Tables) uint64 {
-	var result uint64 = 0
+func heuristic(n *Node, tables *Tables) int {
+	index := cube.GetEdgeOrientations(n.c)
 
-	p := strings.Split(tables.G0[cube.GetEdgeOrientations(n.c)], " ")
-
-	for i, v := range p {
-		if i < len(*n.p) && (*n.p)[i] == v {
-			continue
-		}
-
-		result += 1
+	if index == 0 {
+		return 0
 	}
 
-	return result
+	return len(strings.Split(tables.G0[index], " "))
 }
 
 func Solve(c *cube.Cube, tables *Tables) {
-	// solution := IDAStar(c, func(c *cube.Cube) uint64 { return heuristic(c, tables) })
+	root := &Node{
+		c,
+		"",
+	}
 
-	// solution := append(make([]string, 0, 100), cube.ApplyMoves(c, IDBFS(c, cube.G0, cube.G0Condition))...)
+	solved := IDAStar(
+		root,
+		cube.G0,
+		func(n *Node) int { return heuristic(n, tables) },
+		func(n *Node) bool { return cube.G0Condition(n.c) },
+	)
 
-	//fmt.Println(solution)
-	//cube.Print(c)
-
-	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G1, cube.G1Condition))...)
-
-	// fmt.Println(solution)
-	// cube.Print(c)
-
-	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G2, cube.G2Condition))...)
-
-	// fmt.Println(solution)
-	// cube.Print(c)
-
-	// solution = append(solution, cube.ApplyMoves(c, IDBFS(c, cube.G3, cube.G3Condition))...)
-
-	// fmt.Println(solution)
-	// cube.Print(c)
+	cube.Print(solved.c)
+	fmt.Printf("Path: %s : %d : %t\n", solved.p, heuristic(solved, tables), cube.G0Condition(solved.c))
 }
 
 func IDAStar(
-	c *cube.Cube, // Cube
+	root *Node,
 	g map[string]func(*cube.Cube) *cube.Cube, // Possible moves
-	h func(*cube.Cube) uint64, // Heuristic function
-	s func(*cube.Cube) bool, // Is solved check
-) (solution []string) {
-	bound := h(c)
+	h func(*Node) int, // Heuristic function
+	s func(*Node) bool, // Is solved check
+) *Node {
+	bound := h(root)
+	path := []*Node{root}
 
-	for search(c, g, h, s, &solution) {
+	for {
+		t := search(&path, 0, g, h, s, bound)
 
+		if t == 0 {
+			return path[len(path)-1]
+		} else if t == math.MaxInt {
+			return nil
+		}
+
+		bound = t
 	}
-
-	return
 }
 
 func search(
-	c *cube.Cube,
+	path *[]*Node,
+	cost int,
 	g map[string]func(*cube.Cube) *cube.Cube,
-	h func(*cube.Cube) uint64,
-	s func(*cube.Cube) bool,
-	solution *[]string,
-) bool {
-	return false
+	h func(*Node) int,
+	s func(*Node) bool,
+	bound int,
+) int {
+	node := (*path)[len(*path)-1]
+
+	f := cost + h(node)
+
+	if f > bound {
+		return f
+	}
+
+	if s(node) {
+		return 0
+	}
+
+	min := math.MaxInt
+
+	for k, v := range g {
+		*path = append(*path, &Node{v(cube.Copy(node.c)), node.p + k + " "})
+
+		t := search(path, cost+1, g, h, s, bound)
+
+		if t == 0 {
+			return 0
+		}
+
+		if t < min {
+			min = t
+		}
+
+		*path = (*path)[:len(*path)-1]
+	}
+
+	return min
 }
 
 func IDDFS(c *cube.Cube, g map[string]func(*cube.Cube) *cube.Cube, s func(*cube.Cube) bool) []string {

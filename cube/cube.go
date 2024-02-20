@@ -2,7 +2,6 @@ package cube
 
 import (
 	"log"
-	"math/rand"
 	"strings"
 )
 
@@ -33,6 +32,9 @@ type Cube struct {
 	D uint64
 }
 
+type Cube2 struct {
+}
+
 func Create() *Cube {
 	return &Cube{
 		U: SU,
@@ -53,21 +55,6 @@ func Copy(c *Cube) *Cube {
 		B: c.B,
 		D: c.D,
 	}
-}
-
-func GetRandomMixSequence(n int) (sequence string) {
-	possibleMoves := strings.Split("F R L B U D F' R' L' B' U' D' F2 R2 L2 B2 U2 D2", " ")
-
-	for i := 0; i < n; i += 1 {
-
-		sequence += possibleMoves[rand.Intn(len(possibleMoves))]
-
-		if i+1 != n {
-			sequence += " "
-		}
-	}
-
-	return
 }
 
 func ApplyMoves(cube *Cube, sequence []string) []string {
@@ -281,6 +268,60 @@ func GetEdgeOrientations(c *Cube) uint16 {
 	}
 
 	if ((c.B&g7)>>56)&(L|R) > 0 {
+		result |= 2048
+	}
+
+	return result
+}
+
+func GetCornerOrientationAndFourEdges(c *Cube) uint16 {
+	var result uint16 = 0
+
+	if (c.L&g0)&(L|R) == 0 {
+		result |= 1
+	}
+
+	if ((c.L&g2)>>16)&(L|R) == 0 {
+		result |= 2
+	}
+
+	if ((c.L&g4)>>32)&(L|R) == 0 {
+		result |= 4
+	}
+
+	if ((c.L&g6)>>48)&(L|R) == 0 {
+		result |= 8
+	}
+
+	if (c.R&g0)&(L|R) == 0 {
+		result |= 16
+	}
+
+	if ((c.R&g2)>>16)&(L|R) == 0 {
+		result |= 32
+	}
+
+	if ((c.R&g4)>>32)&(L|R) == 0 {
+		result |= 64
+	}
+
+	if ((c.R&g6)>>48)&(L|R) == 0 {
+		result |= 128
+	}
+
+	if ((c.L&g1)>>8)&(D|U|F|B) > 0 {
+		result |= 256
+	}
+
+	if ((c.L&g5)>>40)&(D|U|F|B) > 0 {
+		result |= 512
+	}
+
+	if ((c.R&g1)>>8)&(D|U|F|B) > 0 {
+		result |= 1024
+	}
+
+	if ((c.R&g5)>>40)&(D|U|F|B) > 0 {
 		result |= 2048
 	}
 

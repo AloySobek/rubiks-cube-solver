@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"regexp"
 	"strings"
@@ -11,14 +12,33 @@ import (
 
 	"github.com/AloySobek/Rubik/algorithm"
 	"github.com/AloySobek/Rubik/cube"
+	"github.com/AloySobek/Rubik/database"
+	"github.com/AloySobek/Rubik/model"
+	"github.com/AloySobek/Rubik/render"
+	"github.com/AloySobek/Rubik/solver"
 	"github.com/urfave/cli/v2"
 )
+
+func GetRandomMixSequence(n int) (sequence string) {
+	possibleMoves := strings.Split("F R L B U D F' R' L' B' U' D' F2 R2 L2 B2 U2 D2", " ")
+
+	for i := 0; i < n; i += 1 {
+
+		sequence += possibleMoves[rand.Intn(len(possibleMoves))]
+
+		if i+1 != n {
+			sequence += " "
+		}
+	}
+
+	return
+}
 
 func app(ctx *cli.Context) error {
 	sequence := ctx.Args().Get(0)
 
 	if sequence == "" {
-		sequence = cube.GetRandomMixSequence(ctx.Int("n"))
+		sequence = GetRandomMixSequence(ctx.Int("n"))
 	} else {
 		sequence = regexp.MustCompile("\\s+").ReplaceAllString(sequence, " ")
 	}
@@ -35,7 +55,11 @@ func app(ctx *cli.Context) error {
 
 	start := time.Now()
 
-	algorithm.Solve(c)
+	tables := algorithm.Tables{
+		G0: algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table")),
+	}
+
+	algorithm.Solve(c, &tables)
 
 	elapsed := time.Since(start)
 
@@ -45,12 +69,12 @@ func app(ctx *cli.Context) error {
 }
 
 func interactive(ctx *cli.Context) error {
-	c := cube.Create()
+	c := model.Create(nil)
 
 	for reader := bufio.NewReader(os.Stdin); ; {
-		fmt.Printf("\033[0;0H")
+		fmt.Printf("\033[2J")
 
-		cube.Print(c)
+		render.Render(c)
 
 		fmt.Print("Enter rotation: ")
 
@@ -66,99 +90,29 @@ func interactive(ctx *cli.Context) error {
 			break
 		}
 
-		switch input {
-		case "U":
-			{
-				cube.Up(c)
-			}
-		case "U2":
-			{
-				cube.Up2(c)
-			}
-		case "U'":
-			{
-				cube.UpPrime(c)
-			}
-
-		case "D":
-			{
-				cube.Down(c)
-			}
-		case "D2":
-			{
-				cube.Down2(c)
-			}
-		case "D'":
-			{
-				cube.DownPrime(c)
-			}
-		case "R":
-			{
-				cube.Right(c)
-			}
-		case "R2":
-			{
-				cube.Right2(c)
-			}
-		case "R'":
-			{
-				cube.RightPrime(c)
-			}
-		case "L":
-			{
-				cube.Left(c)
-			}
-		case "L2":
-			{
-				cube.Left2(c)
-			}
-		case "L'":
-			{
-				cube.LeftPrime(c)
-			}
-		case "F":
-			{
-				cube.Front(c)
-			}
-		case "F2":
-			{
-				cube.Front2(c)
-			}
-		case "F'":
-			{
-				cube.FrontPrime(c)
-			}
-		case "B":
-			{
-				cube.Back(c)
-			}
-		case "B2":
-			{
-				cube.Back2(c)
-			}
-		case "B'":
-			{
-				cube.BackPrime(c)
-			}
-		default:
-			{
-				fmt.Printf("Unknown command\n")
-			}
+		if v, ok := solver.G0[input]; ok {
+			v(c)
 		}
-
 	}
 
 	return nil
 }
 
 func gen(ctx *cli.Context) error {
-	algorithm.WriteDataToFile("G0.table", algorithm.GenerateG0Table())
+	i := 0
 
-	table := algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table"))
+	for _, v := range database.GenerateG0() {
+		if v != "" {
+			fmt.Printf("%d: %s\n", i, v)
 
-	for i, v := range table {
-		fmt.Printf("%d: %s\n", i, v)
+			i += 1
+		}
+
 	}
+
+	// algorithm.WriteDataToFile(algorithm.GenerateG0Table(), "G0.table")
+
+	// table := algorithm.ReadG0Table(algorithm.ReadDataFromFile("G0.table"))
 
 	return nil
 }
