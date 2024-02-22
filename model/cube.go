@@ -32,6 +32,11 @@ const (
 	DRB = iota
 )
 
+var (
+	Edges   = [12]uint8{UL, UF, UR, UB, DL, DF, DR, DB, LB, LF, RF, RB}
+	Corners = [8]uint8{ULB, ULF, URF, URB, DLB, DLF, DRF, DRB}
+)
+
 type Cube struct {
 	EO [12]bool
 	EP [12]uint8

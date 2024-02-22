@@ -106,7 +106,9 @@ func dbGen(ctx *cli.Context) error {
 
 	fmt.Printf("Pattern databases has been successfully generated, elapsed time(in seconds): %f\n", elapsed.Seconds())
 
-	fmt.Printf("%d : %d\n", len(solver.DatabaseFromFile().G0), len(solver.DatabaseFromFile().G1))
+	d := solver.DatabaseFromFile()
+
+	fmt.Printf("%d : %d : %d : %d\n", len(d.G0), len(d.G1), len(d.G2), len(d.G3))
 
 	return nil
 }
