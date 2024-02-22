@@ -93,19 +93,27 @@ func interactive(ctx *cli.Context) error {
 }
 
 func dbGen(ctx *cli.Context) error {
-	fmt.Println("Generating pattern databases...")
+	// fmt.Println("Generating pattern databases...")
 
-	if _, err := os.Stat("./assets"); os.IsNotExist(err) {
-		os.Mkdir("./assets", 0777)
+	// if _, err := os.Stat("./assets"); os.IsNotExist(err) {
+	// 	os.Mkdir("./assets", 0777)
+	// }
+
+	// fmt.Println("Generating G0...")
+
+	// database.WriteDataToFile(database.G0ToBytes(database.GenerateG0()), "assets/G0.table")
+
+	i := 0
+
+	for _, v := range database.GenerateG1() {
+		fmt.Printf("%d: %s\n", i, v)
+
+		i += 1
 	}
 
-	fmt.Println("Generating G0...")
+	// fmt.Println("G0 done")
 
-	database.WriteDataToFile(database.G0ToBytes(database.GenerateG0()), "assets/G0.table")
-
-	fmt.Println("G0 done")
-
-	fmt.Println("Pattern databases has been successfully generated")
+	// fmt.Println("Pattern databases has been successfully generated")
 
 	return nil
 }
