@@ -12,7 +12,6 @@ import (
 
 	"github.com/AloySobek/Rubik/algorithm"
 	"github.com/AloySobek/Rubik/cube"
-	"github.com/AloySobek/Rubik/database"
 	"github.com/AloySobek/Rubik/model"
 	"github.com/AloySobek/Rubik/render"
 	"github.com/AloySobek/Rubik/solver"
@@ -84,7 +83,7 @@ func interactive(ctx *cli.Context) error {
 			break
 		}
 
-		if v, ok := solver.G0[input]; ok {
+		if v, ok := model.G0[input]; ok {
 			v(c)
 		}
 	}
@@ -93,27 +92,21 @@ func interactive(ctx *cli.Context) error {
 }
 
 func dbGen(ctx *cli.Context) error {
-	// fmt.Println("Generating pattern databases...")
+	fmt.Println("Generating pattern databases...")
 
-	// if _, err := os.Stat("./assets"); os.IsNotExist(err) {
-	// 	os.Mkdir("./assets", 0777)
-	// }
-
-	// fmt.Println("Generating G0...")
-
-	// database.WriteDataToFile(database.G0ToBytes(database.GenerateG0()), "assets/G0.table")
-
-	i := 0
-
-	for _, v := range database.GenerateG1() {
-		fmt.Printf("%d: %s\n", i, v)
-
-		i += 1
+	if _, err := os.Stat("./assets"); os.IsNotExist(err) {
+		os.Mkdir("./assets", 0777)
 	}
 
-	// fmt.Println("G0 done")
+	start := time.Now()
 
-	// fmt.Println("Pattern databases has been successfully generated")
+	solver.Save(solver.NewDatabase())
+
+	elapsed := time.Since(start)
+
+	fmt.Printf("Pattern databases has been successfully generated, elapsed time(in seconds): %f\n", elapsed.Seconds())
+
+	fmt.Printf("%d : %d\n", len(solver.DatabaseFromFile().G0), len(solver.DatabaseFromFile().G1))
 
 	return nil
 }

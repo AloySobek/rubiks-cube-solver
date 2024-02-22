@@ -6,20 +6,19 @@ const (
 	UR = iota
 	UB = iota
 
-	LB = iota
-	LF = iota
-	RF = iota
-	RB = iota
-
 	DL = iota
 	DF = iota
 	DR = iota
 	DB = iota
+
+	LB = iota
+	LF = iota
+	RF = iota
+	RB = iota
 )
 
 //  0   1   2   3   4   5   6   7
 // ULB ULF URF URB DLB DLF DRF DRB
-//
 
 const (
 	ULB = iota
@@ -52,7 +51,7 @@ func Create(c *Cube) *Cube {
 
 	return &Cube{
 		EO: [12]bool{},
-		EP: [12]uint8{UL, UF, UR, UB, LB, LF, RF, RB, DL, DB, DR, DF},
+		EP: [12]uint8{UL, UF, UR, UB, DL, DB, DR, DF, LB, LF, RF, RB},
 		CO: [8]uint8{},
 		CP: [8]uint8{ULB, ULF, URF, URB, DLB, DLF, DRF, DRB},
 	}
