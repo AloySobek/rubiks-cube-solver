@@ -1,15 +1,20 @@
 package model
 
-const (
-	UL = iota
-	UF = iota
-	UR = iota
-	UB = iota
+import (
+	"log"
+	"strings"
+)
 
-	DL = iota
-	DF = iota
-	DR = iota
-	DB = iota
+const (
+	UL = iota // 0
+	UF = iota // 1 y
+	UR = iota // 2
+	UB = iota // 3 y
+
+	DL = iota // 4
+	DF = iota // 5 y
+	DR = iota // 6
+	DB = iota // 7 y
 
 	LB = iota
 	LF = iota
@@ -56,8 +61,20 @@ func Create(c *Cube) *Cube {
 
 	return &Cube{
 		EO: [12]bool{},
-		EP: [12]uint8{UL, UF, UR, UB, DL, DB, DR, DF, LB, LF, RF, RB},
+		EP: [12]uint8{UL, UF, UR, UB, DL, DF, DR, DB, LB, LF, RF, RB},
 		CO: [8]uint8{},
 		CP: [8]uint8{ULB, ULF, URF, URB, DLB, DLF, DRF, DRB},
 	}
+}
+
+func ApplyMoves(c *Cube, sequence []string) []string {
+	for _, v := range sequence {
+		if move, ok := G0[strings.ToUpper(v)]; ok {
+			move(c)
+		} else {
+			log.Fatalf("Unsupported move: %s", v)
+		}
+	}
+
+	return sequence
 }

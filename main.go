@@ -4,14 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"os"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/AloySobek/Rubik/algorithm"
-	"github.com/AloySobek/Rubik/cube"
 	"github.com/AloySobek/Rubik/model"
 	"github.com/AloySobek/Rubik/render"
 	"github.com/AloySobek/Rubik/solver"
@@ -44,21 +43,21 @@ func solve(ctx *cli.Context) error {
 
 	fmt.Printf("Initial mix sequence: %s\n\n", sequence)
 
-	c := cube.Create()
+	c := model.Create(nil)
 
-	cube.ApplyMoves(c, strings.Split(sequence, " "))
+	model.ApplyMoves(c, strings.Split(sequence, " "))
 
-	fmt.Printf("Mixed cube:\n")
-
-	cube.Print(c)
+	d := solver.DatabaseFromFile()
 
 	start := time.Now()
 
-	algorithm.Solve(c)
+	_, s := solver.Solve(c, d)
 
 	elapsed := time.Since(start)
 
-	fmt.Printf("Solution time: %f\n", elapsed.Seconds())
+	fmt.Println(s)
+
+	fmt.Printf("Solution time: %d ms\n", elapsed.Milliseconds())
 
 	return nil
 }
@@ -109,6 +108,23 @@ func dbGen(ctx *cli.Context) error {
 	d := solver.DatabaseFromFile()
 
 	fmt.Printf("%d : %d : %d : %d\n", len(d.G0), len(d.G1), len(d.G2), len(d.G3))
+
+	min := math.MaxInt
+	max := 0
+
+	for _, v := range d.G1 {
+		if v < min {
+			min = v
+		}
+
+		if v > max {
+			max = v
+		}
+
+	}
+
+	fmt.Println(min)
+	fmt.Println(max)
 
 	return nil
 }

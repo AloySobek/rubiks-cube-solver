@@ -5,46 +5,44 @@ import (
 	"math"
 )
 
-func Solve(c *model.Cube, d Database) *model.Cube {
-	return (IDAStar(
+func Solve(c *model.Cube, d Database) (*model.Cube, string) {
+	s :=
 		IDAStar(
 			IDAStar(
-				IDAStar(
-					&node{c, ""},
-					model.G0,
-					func(n *node) int { return 0 },
-					func(n *node) bool { return true },
-				),
-				model.G1,
-				func(n *node) int { return 0 },
-				func(n *node) bool { return true },
-			),
-			model.G2,
-			func(n *node) int { return 0 },
-			func(n *node) bool { return true },
-		),
-		model.G3,
-		func(n *node) int { return 0 },
-		func(n *node) bool { return true },
-	)).c
+				node{c, ""},
+				model.G0,
+				func(n node) int {
+					return d.G0[G0Index(n.c)]
+				}, func(n node) bool {
+					if _, ok := d.G0Goal[G0Index(n.c)]; !ok {
+						return false
+					}
+
+					return true
+				}),
+			model.G1,
+			func(n node) int {
+				return d.G1[G1Index(n.c)]
+			}, func(n node) bool {
+				if _, ok := d.G1Goal[G1Index(n.c)]; !ok {
+					return false
+				}
+
+				return true
+			})
+
+	return s.c, s.m
 }
 
-func IDAStar(
-	root *node,
-	g map[string]func(*model.Cube) *model.Cube,
-	h func(*node) int,
-	s func(*node) bool,
-) *node {
+func IDAStar(root node, g map[string]func(*model.Cube) *model.Cube, h func(node) int, i func(node) bool) node {
 	bound := h(root)
-	path := []*node{root}
+	path := []node{root}
 
 	for {
-		t := search(&path, 0, g, h, s, bound)
+		t := search(&path, 0, g, h, i, bound)
 
 		if t == 0 {
 			return path[len(path)-1]
-		} else if t == math.MaxInt {
-			return nil
 		}
 
 		bound = t
@@ -52,11 +50,11 @@ func IDAStar(
 }
 
 func search(
-	path *[]*node,
+	path *[]node,
 	cost int,
 	g map[string]func(*model.Cube) *model.Cube,
-	h func(*node) int,
-	s func(*node) bool,
+	h func(node) int,
+	i func(node) bool,
 	bound int,
 ) int {
 	n := (*path)[len(*path)-1]
@@ -67,16 +65,22 @@ func search(
 		return f
 	}
 
-	if s(n) {
+	if i(n) {
 		return 0
 	}
 
 	min := math.MaxInt
 
 	for k, v := range g {
-		*path = append(*path, &node{v(model.Create(n.c)), n.m + k + " "})
+		nn := node{v(model.Create(n.c)), n.m + k + " "}
 
-		t := search(path, cost+1, g, h, s, bound)
+		if alreadyInPath(nn, *path) {
+			continue
+		}
+
+		*path = append(*path, nn)
+
+		t := search(path, cost+1, g, h, i, bound)
 
 		if t == 0 {
 			return 0
@@ -90,4 +94,63 @@ func search(
 	}
 
 	return min
+}
+
+func IDDFS(c *model.Cube, g map[string]func(*model.Cube) *model.Cube, s func(*model.Cube) bool) []string {
+	solution := make([]string, 0, 64)
+
+	for i := 0; !DLS(c, g, s, i, &solution); i += 1 {
+	}
+
+	return solution
+}
+
+func DLS(c *model.Cube, g map[string]func(*model.Cube) *model.Cube, s func(*model.Cube) bool, depth int, solution *[]string) bool {
+	if depth <= 0 {
+		return s(c)
+	}
+
+	for k, v := range g {
+		*solution = append(*solution, k)
+
+		if DLS(v(model.Create(c)), g, s, depth-1, solution) {
+			return true
+		}
+
+		*solution = (*solution)[:len(*solution)-1]
+	}
+
+	return false
+}
+
+func alreadyInPath(n node, path []node) bool {
+	for _, v := range path {
+		same := true
+
+		for i := 0; i < 12; i += 1 {
+			if n.c.EO[i] != v.c.EO[i] || n.c.EP[i] != v.c.EP[i] {
+				same = false
+
+				break
+			}
+		}
+
+		if !same {
+			continue
+		}
+
+		for i := 0; i < 8; i += 1 {
+			if n.c.CO[i] != v.c.CO[i] || n.c.CP[i] != v.c.CP[i] {
+				same = false
+
+				break
+			}
+		}
+
+		if same {
+			return true
+		}
+	}
+
+	return false
 }

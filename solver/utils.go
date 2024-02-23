@@ -37,7 +37,7 @@ func readDataFromFile(filepath string) *bytes.Buffer {
 	return buffer
 }
 
-func mapToBytes(m map[uint64]string) *bytes.Buffer {
+func mapToBytes(m map[uint64]int) *bytes.Buffer {
 	buffer := bytes.NewBuffer([]byte{})
 
 	encoder := gob.NewEncoder(buffer)
@@ -49,8 +49,8 @@ func mapToBytes(m map[uint64]string) *bytes.Buffer {
 	return buffer
 }
 
-func bytesToMap(b *bytes.Buffer) map[uint64]string {
-	var m map[uint64]string
+func bytesToMap(b *bytes.Buffer) map[uint64]int {
+	var m map[uint64]int
 
 	decoder := gob.NewDecoder(b)
 
