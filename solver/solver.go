@@ -31,6 +31,10 @@ func Solve(c *model.Cube, d Database) (*model.Cube, string) {
 				return true
 			})
 
+	// IDDFS(s.c, model.G2, func(c *model.Cube) bool {
+	// 	return true
+	// })
+
 	return s.c, s.m
 }
 
