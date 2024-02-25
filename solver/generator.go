@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+var (
+	cornerNames = [8]string{"ULB", "ULF", "URF", "URB", "DLB", "DLF", "DRF", "DRB"}
+	edgeNames   = [12]string{"UL", "UF", "UR", "UB", "DL", "DF", "DR", "DB", "LB", "LF", "RF", "RB"}
+)
+
+var opposite = map[byte]byte{'U': 'D', 'L': 'R', 'F': 'B', 'R': 'L', 'B': 'F', 'D': 'U'}
+
 func bfs(root *model.Cube, g map[string]func(*model.Cube) *model.Cube, table map[uint64]int, i func(c *model.Cube) uint64) {
 	queue := make([]node, 0)
 
@@ -39,32 +46,17 @@ func generate(g map[string]func(*model.Cube) *model.Cube, f func(c *model.Cube) 
 }
 
 func DatabaseFromFile() Database {
-	d := Database{
+	return Database{
 		G0: bytesToMap(readDataFromFile("assets/G0.table")),
 		G1: bytesToMap(readDataFromFile("assets/G1.table")),
 		G2: bytesToMap(readDataFromFile("assets/G2.table")),
 		G3: bytesToMap(readDataFromFile("assets/G3.table")),
 
-		G0Goal: map[uint64]bool{},
-		G1Goal: map[uint64]bool{},
-		G2Goal: map[uint64]bool{},
-		G3Goal: map[uint64]bool{},
+		G0Goal: map[uint64]bool{G0Index(model.Create(nil)): true},
+		G1Goal: map[uint64]bool{G1Index(model.Create(nil)): true},
+		G2Goal: map[uint64]bool{G2Index(model.Create(nil)): true},
+		G3Goal: map[uint64]bool{G3Index(model.Create(nil)): true},
 	}
-
-	solved := model.Create(nil)
-
-	d.G0Goal[G0Index(solved)] = true
-
-	for i := 0; i < 4; i += 1 {
-		d.G1Goal[G1Index(solved)] = true
-
-		solved = model.L(solved)
-		solved = model.L(solved)
-		solved = model.L(solved)
-		solved = model.R(solved)
-	}
-
-	return d
 }
 
 func G0Index(c *model.Cube) uint64 {
@@ -102,11 +94,73 @@ func G1Index(c *model.Cube) uint64 {
 func G2Index(c *model.Cube) uint64 {
 	var result uint64 = 0
 
+	for i := 0; i < 7; i += 1 {
+		for j := 0; j < 3; j += 1 {
+			result <<= 1
+
+			t := cornerNames[c.CP[i]][(int(c.CO[i])+j)%3]
+
+			if !(t == cornerNames[i][j] || t == opposite[cornerNames[i][j]]) {
+				result += 1
+			}
+		}
+	}
+
+	// for i := 0; i < 11; i += 1 {
+	// 	for j := 0; j < 2; j += 1 {
+	// 		result <<= 1
+
+	// 		t := edgeNames[c.EP[i]][j]
+
+	// 		if !(t == edgeNames[i][j] || t == opposite[edgeNames[i][j]]) {
+	// 			result += 1
+	// 		}
+	// 	}
+	// }
+	// for i := 0; i < 8; i += 1 {
+	// 	result <<= 1
+	// 	if int(c.CP[i])%4 != i%4 {
+	// 		result++
+	// 	}
+	// }
+
+	// result <<= 1
+
+	// for i := 0; i < 8; i += 1 {
+	// 	for j := i + 1; j < 8; j += 1 {
+	// 		if c.CP[i] > c.CP[j] {
+	// 			result ^= 1
+	// 		} else {
+	// 			result ^= 0
+	// 		}
+	// 	}
+	// }
+
 	return result
 }
 
 func G3Index(c *model.Cube) uint64 {
 	var result uint64 = 0
+
+	for i := 0; i < 8; i += 1 {
+		for j := 0; j < 3; j += 1 {
+			result <<= 1
+
+			if cornerNames[c.CP[i]][j] == opposite[cornerNames[i][j]] {
+				result += 1
+			}
+		}
+	}
+
+	for i := 0; i < 12; i += 1 {
+		for j := 0; j < 2; j += 1 {
+			result <<= 1
+
+			if edgeNames[c.EP[i]][j] == opposite[edgeNames[i][j]] {
+				result += 1
+			}
+		}
+	}
 
 	return result
 }

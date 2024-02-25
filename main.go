@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"math/rand"
 	"os"
 	"regexp"
@@ -108,23 +107,6 @@ func dbGen(ctx *cli.Context) error {
 	d := solver.DatabaseFromFile()
 
 	fmt.Printf("%d : %d : %d : %d\n", len(d.G0), len(d.G1), len(d.G2), len(d.G3))
-
-	min := math.MaxInt
-	max := 0
-
-	for _, v := range d.G1 {
-		if v < min {
-			min = v
-		}
-
-		if v > max {
-			max = v
-		}
-
-	}
-
-	fmt.Println(min)
-	fmt.Println(max)
 
 	return nil
 }

@@ -123,7 +123,7 @@ func R(c *Cube) *Cube {
 	c.CP[URB] = c.CP[URF]
 	c.CP[URF] = c.CP[DRF]
 	c.CP[DRF] = c.CP[DRB]
-	c.CP[DRF] = urb
+	c.CP[DRB] = urb
 
 	return c
 }
