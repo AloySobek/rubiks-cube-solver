@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AloySobek/Rubik/model"
+	"github.com/AloySobek/Rubik/cube"
 	"github.com/AloySobek/Rubik/render"
 	"github.com/AloySobek/Rubik/solver"
 	"github.com/urfave/cli/v2"
@@ -42,11 +42,11 @@ func solve(ctx *cli.Context) error {
 
 	fmt.Printf("Initial mix sequence: %s\n\n", sequence)
 
-	c := model.Create(nil)
+	c := cube.Create(nil)
 
-	model.ApplyMoves(c, strings.Split(sequence, " "))
+	cube.ApplyMoves(c, strings.Split(sequence, " "))
 
-	d := solver.DatabaseFromFile()
+	d := solver.PatternDatabase()
 
 	start := time.Now()
 
@@ -62,7 +62,7 @@ func solve(ctx *cli.Context) error {
 }
 
 func interactive(ctx *cli.Context) error {
-	c := model.Create(nil)
+	c := cube.Create(nil)
 
 	for reader := bufio.NewReader(os.Stdin); ; {
 		render.Render(c)
@@ -81,7 +81,7 @@ func interactive(ctx *cli.Context) error {
 			break
 		}
 
-		if v, ok := model.G0[input]; ok {
+		if v, ok := cube.G0[input]; ok {
 			v(c)
 		}
 	}
@@ -89,32 +89,8 @@ func interactive(ctx *cli.Context) error {
 	return nil
 }
 
-func dbGen(ctx *cli.Context) error {
-	fmt.Println("Generating pattern databases...")
-
-	if _, err := os.Stat("./assets"); os.IsNotExist(err) {
-		os.Mkdir("./assets", 0777)
-	}
-
-	start := time.Now()
-
-	solver.Save(solver.NewDatabase())
-
-	elapsed := time.Since(start)
-
-	fmt.Printf("Pattern databases has been successfully generated, elapsed time(in seconds): %f\n", elapsed.Seconds())
-
-	d := solver.DatabaseFromFile()
-
-	fmt.Printf("%d : %d : %d : %d\n", len(d.G0), len(d.G1), len(d.G2), len(d.G3))
-
-	return nil
-}
-
 func application(ctx *cli.Context) error {
-	if ctx.Bool("db") {
-		return dbGen(ctx)
-	} else if ctx.Bool("i") {
+	if ctx.Bool("i") {
 		return interactive(ctx)
 	}
 
@@ -126,11 +102,6 @@ func main() {
 		Name:  "Rubik",
 		Usage: "Rubik's cube solver",
 		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "db",
-				Value: false,
-				Usage: "Generate pattern databases only",
-			},
 			&cli.BoolFlag{
 				Name:  "i",
 				Value: false,

@@ -2,7 +2,7 @@ package render
 
 import (
 	"fmt"
-	"github.com/AloySobek/Rubik/model"
+	"github.com/AloySobek/Rubik/cube"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 	D = 'O'
 )
 
-func Render(c *model.Cube) {
+func Render(c *cube.Cube) {
 	buffer := make([][]rune, 11)
 
 	for i := 0; i < 11; i += 1 {
@@ -59,10 +59,6 @@ func draw(buffer [][]rune) {
 	}
 
 	fmt.Println()
-}
-
-func put(buffer [][]rune, c *model.Cube, color rune, iy, ix int) {
-
 }
 
 func putEdges(buffer [][]rune, side uint64, color rune, iy, ix int) {

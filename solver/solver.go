@@ -1,44 +1,29 @@
 package solver
 
 import (
-	"github.com/AloySobek/Rubik/model"
+	"github.com/AloySobek/Rubik/cube"
 	"math"
 )
 
-func Solve(c *model.Cube, d Database) (*model.Cube, string) {
-	s :=
-		IDAStar(
-			IDAStar(
-				node{c, ""},
-				model.G0,
-				func(n node) int {
-					return d.G0[G0Index(n.c)]
-				}, func(n node) bool {
-					if _, ok := d.G0Goal[G0Index(n.c)]; !ok {
-						return false
-					}
+func Solve(c *cube.Cube, d Database) (*cube.Cube, string) {
+	s := node{c, ""}
 
-					return true
-				}),
-			model.G1,
-			func(n node) int {
-				return d.G1[G1Index(n.c)]
-			}, func(n node) bool {
-				if _, ok := d.G1Goal[G1Index(n.c)]; !ok {
-					return false
-				}
-
+	for i := 0; i < 3; i += 1 {
+		s = idaStar(s, cube.GS[i], func(n node) int {
+			return d.tables[i][indices[i](n.c)]
+		}, func(n node) bool {
+			if _, ok := d.goals[i][indices[i](n.c)]; ok {
 				return true
-			})
+			}
 
-	// IDDFS(s.c, model.G2, func(c *model.Cube) bool {
-	// 	return true
-	// })
+			return false
+		})
+	}
 
 	return s.c, s.m
 }
 
-func IDAStar(root node, g map[string]func(*model.Cube) *model.Cube, h func(node) int, i func(node) bool) node {
+func idaStar(root node, g map[string]func(*cube.Cube) *cube.Cube, h func(node) int, i func(node) bool) node {
 	bound := h(root)
 	path := []node{root}
 
@@ -56,7 +41,7 @@ func IDAStar(root node, g map[string]func(*model.Cube) *model.Cube, h func(node)
 func search(
 	path *[]node,
 	cost int,
-	g map[string]func(*model.Cube) *model.Cube,
+	g map[string]func(*cube.Cube) *cube.Cube,
 	h func(node) int,
 	i func(node) bool,
 	bound int,
@@ -76,7 +61,7 @@ func search(
 	min := math.MaxInt
 
 	for k, v := range g {
-		nn := node{v(model.Create(n.c)), n.m + k + " "}
+		nn := node{v(cube.Create(n.c)), n.m + k + " "}
 
 		if alreadyInPath(nn, *path) {
 			continue
@@ -98,33 +83,6 @@ func search(
 	}
 
 	return min
-}
-
-func IDDFS(c *model.Cube, g map[string]func(*model.Cube) *model.Cube, s func(*model.Cube) bool) []string {
-	solution := make([]string, 0, 64)
-
-	for i := 0; !DLS(c, g, s, i, &solution); i += 1 {
-	}
-
-	return solution
-}
-
-func DLS(c *model.Cube, g map[string]func(*model.Cube) *model.Cube, s func(*model.Cube) bool, depth int, solution *[]string) bool {
-	if depth <= 0 {
-		return s(c)
-	}
-
-	for k, v := range g {
-		*solution = append(*solution, k)
-
-		if DLS(v(model.Create(c)), g, s, depth-1, solution) {
-			return true
-		}
-
-		*solution = (*solution)[:len(*solution)-1]
-	}
-
-	return false
 }
 
 func alreadyInPath(n node, path []node) bool {

@@ -7,25 +7,27 @@ import (
 	"os"
 )
 
-func writeDataToFile(data *bytes.Buffer, filepath string) {
+func writeDataToFile(data *bytes.Buffer, filepath string) error {
 	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0644)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer file.Close()
 
 	if _, err := file.Write(data.Bytes()); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
-func readDataFromFile(filepath string) *bytes.Buffer {
+func readDataFromFile(filepath string) (*bytes.Buffer, error) {
 	file, err := os.OpenFile(filepath, os.O_RDONLY, 0644)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	defer file.Close()
@@ -34,29 +36,37 @@ func readDataFromFile(filepath string) *bytes.Buffer {
 
 	io.Copy(buffer, file)
 
-	return buffer
+	return buffer, nil
 }
 
-func mapToBytes(m map[uint64]int) *bytes.Buffer {
+func mapToBytes(m map[uint64]int) (*bytes.Buffer, error) {
 	buffer := bytes.NewBuffer([]byte{})
 
 	encoder := gob.NewEncoder(buffer)
 
 	if err := encoder.Encode(m); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return buffer
+	return buffer, nil
 }
 
-func bytesToMap(b *bytes.Buffer) map[uint64]int {
+func bytesToMap(b *bytes.Buffer) (map[uint64]int, error) {
 	var m map[uint64]int
 
 	decoder := gob.NewDecoder(b)
 
 	if err := decoder.Decode(&m); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return m
+	return m, nil
+}
+
+func fileExists(filepath string) bool {
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
 }
