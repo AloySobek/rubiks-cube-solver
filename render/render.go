@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	U = 'R'
-	L = 'B'
-	F = 'W'
-	R = 'G'
-	B = 'Y'
-	D = 'O'
+	CU = 'R'
+	CL = 'B'
+	CF = 'W'
+	CR = 'G'
+	CB = 'Y'
+	CD = 'O'
 )
 
 func Render(c *cube.Cube) {
@@ -21,19 +21,17 @@ func Render(c *cube.Cube) {
 		buffer[i] = make([]rune, 15)
 	}
 
-	// putSide(buffer, cube.U, 'W', 0, 4)
-	// putSide(buffer, cube.L, 'G', 4, 0)
-	// putSide(buffer, cube.F, 'R', 4, 4)
-	// putSide(buffer, cube.R, 'B', 4, 8)}
-	// putSide(buffer, cube.B, 'O', 4, 12
-	// putSide(buffer, cube.D, 'Y', 8, 4)func Print(cube *Cube) {
+	putSide(buffer, c.U, CU, 0, 4)
+	putSide(buffer, c.L, CL, 4, 0)
+	putSide(buffer, c.F, CF, 4, 4)
+	putSide(buffer, c.R, CR, 4, 8)
+	putSide(buffer, c.B, CB, 4, 12)
+	putSide(buffer, c.D, CD, 8, 4)
 
-	fmt.Println(c.CO)
-
-	// draw(buffer)
+	render(buffer)
 }
 
-func draw(buffer [][]rune) {
+func render(buffer [][]rune) {
 	fmt.Println()
 
 	for y := 0; y < 11; y += 1 {
@@ -61,7 +59,7 @@ func draw(buffer [][]rune) {
 	fmt.Println()
 }
 
-func putEdges(buffer [][]rune, side uint64, color rune, iy, ix int) {
+func putSide(buffer [][]rune, side uint64, color rune, iy, ix int) {
 	y := iy
 	x := ix
 	i := 0
@@ -95,18 +93,18 @@ func putEdges(buffer [][]rune, side uint64, color rune, iy, ix int) {
 
 func getSideCubieColor(side uint64, position int) rune {
 	switch (side & (uint64(0xFF) << (8 * position))) >> (8 * position) {
-	case U:
-		return 'W'
-	case L:
-		return 'G'
-	case F:
-		return 'R'
-	case R:
-		return 'B'
-	case B:
-		return 'O'
-	case D:
-		return 'Y'
+	case cube.UU:
+		return CU
+	case cube.LL:
+		return CL
+	case cube.FF:
+		return CF
+	case cube.RR:
+		return CR
+	case cube.BB:
+		return CB
+	case cube.DD:
+		return CD
 	default:
 		return ' '
 	}

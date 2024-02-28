@@ -24,16 +24,7 @@ const (
 	g7 = 0xFF00000000000000
 )
 
-var huh = []uint64{g0, g1, g2, g3, g4, g5, g6, g7}
-
-const (
-	U = uint64(1)
-	L = uint64(2)
-	F = uint64(4)
-	R = uint64(8)
-	B = uint64(16)
-	D = uint64(32)
-)
+var getters = []uint64{g0, g1, g2, g3, g4, g5, g6, g7}
 
 func G0Index(c *cube.Cube) uint64 {
 	var result uint64 = 0
@@ -86,7 +77,7 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.U&huh[i])>>(8*i))&(U|D) == 0 {
+		if ((c.U&getters[i])>>(8*i))&(cube.UU|cube.DD) == 0 {
 			result += 1
 		}
 	}
@@ -94,7 +85,7 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.L&huh[i])>>(8*i))&(L|R) == 0 {
+		if ((c.L&getters[i])>>(8*i))&(cube.LL|cube.RR) == 0 {
 			result += 1
 		}
 	}
@@ -102,7 +93,7 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.F&huh[i])>>(8*i))&(F|B) == 0 {
+		if ((c.F&getters[i])>>(8*i))&(cube.FF|cube.BB) == 0 {
 			result += 1
 		}
 	}
@@ -110,7 +101,7 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.R&huh[i])>>(8*i))&(L|R) == 0 {
+		if ((c.R&getters[i])>>(8*i))&(cube.LL|cube.RR) == 0 {
 			result += 1
 		}
 	}
@@ -118,7 +109,7 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.B&huh[i])>>(8*i))&(F|B) == 0 {
+		if ((c.B&getters[i])>>(8*i))&(cube.FF|cube.BB) == 0 {
 			result += 1
 		}
 	}
@@ -126,41 +117,10 @@ func G2Index(c *cube.Cube) uint64 {
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
 
-		if ((c.D&huh[i])>>(8*i))&(U|D) == 0 {
+		if ((c.D&getters[i])>>(8*i))&(cube.UU|cube.DD) == 0 {
 			result += 1
 		}
 	}
-
-	// for i := 0; i < 8; i += 1 {
-	// 	for j := 0; j < 3; j += 1 {
-	// 		result <<= 1
-
-	// 		// if c.CP[i] == cube.DRF {
-	// 		// 	fmt.Printf("Huh: %c : %c\n",
-	// 		// 		cube.CornerNames[c.CP[i]][j],
-	// 		// 		cube.CornerNames[i][j],
-	// 		// 	)
-	// 		// }
-
-	// 		t := cube.CornerNames[c.CP[i]][j]
-
-	// 		if t != cube.CornerNames[i][j] && t != cube.OppositeFace[cube.CornerNames[i][j]] {
-	// 			result += 1
-	// 		}
-	// 	}
-	// }
-
-	// for i := 0; i < 12; i += 1 {
-	// 	for j := 0; j < 2; j += 1 {
-	// 		result <<= 1
-
-	// 		t := cube.EdgeNames[c.EP[i]][j]
-
-	// 		if !(t == cube.EdgeNames[i][j] || t == cube.OppositeFace[cube.EdgeNames[i][j]]) {
-	// 			result += 1
-	// 		}
-	// 	}
-	// }
 
 	for i := 0; i < 8; i += 1 {
 		result <<= 1
