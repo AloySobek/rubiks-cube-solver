@@ -41,26 +41,26 @@ func generate(g map[string]func(*cube.Cube) *cube.Cube, f func(c *cube.Cube) uin
 
 func PatternDatabase() Database {
 	d := Database{
-		tables: make([]map[uint64]int, 4),
-		goals:  make([]map[uint64]bool, 4),
+		Tables: make([]map[uint64]int, 4),
+		Goals:  make([]map[uint64]bool, 4),
 	}
 
 	for i := 0; i < 4; i += 1 {
-		data, err := readDataFromFile(fmt.Sprint("G", i, ".tab"))
+		data, err := readDataFromFile(fmt.Sprint("G", i))
 
 		if err == nil {
-			d.tables[i], err = bytesToMap(data)
+			d.Tables[i], err = bytesToMap(data)
 		} else {
-			d.tables[i] = generate(cube.GS[i], indices[i])
+			d.Tables[i] = generate(cube.GS[i], indices[i])
 
-			data, err = mapToBytes(d.tables[i])
+			data, err = mapToBytes(d.Tables[i])
 
 			if err == nil {
-				writeDataToFile(data, fmt.Sprint("G", i, ".tab"))
+				writeDataToFile(data, fmt.Sprint("G", i))
 			}
 		}
 
-		d.goals[i] = map[uint64]bool{indices[i](cube.Create(nil)): true}
+		d.Goals[i] = map[uint64]bool{indices[i](cube.Create(nil)): true}
 	}
 
 	return d

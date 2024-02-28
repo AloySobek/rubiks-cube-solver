@@ -8,11 +8,11 @@ import (
 func Solve(c *cube.Cube, d Database) (*cube.Cube, string) {
 	s := node{c, ""}
 
-	for i := 0; i < 3; i += 1 {
+	for i := 0; i < 4; i += 1 {
 		s = idaStar(s, cube.GS[i], func(n node) int {
-			return d.tables[i][indices[i](n.c)]
+			return d.Tables[i][indices[i](n.c)]
 		}, func(n node) bool {
-			if _, ok := d.goals[i][indices[i](n.c)]; ok {
+			if _, ok := d.Goals[i][indices[i](n.c)]; ok {
 				return true
 			}
 

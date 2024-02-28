@@ -48,6 +48,8 @@ func solve(ctx *cli.Context) error {
 
 	d := solver.PatternDatabase()
 
+	fmt.Printf("%d : %d : %d : %d\n", len(d.Tables[0]), len(d.Tables[1]), len(d.Tables[2]), len(d.Tables[3]))
+
 	start := time.Now()
 
 	_, s := solver.Solve(c, d)

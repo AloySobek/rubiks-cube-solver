@@ -24,6 +24,8 @@ func writeDataToFile(data *bytes.Buffer, filepath string) error {
 }
 
 func readDataFromFile(filepath string) (*bytes.Buffer, error) {
+	// return nil, bytes.ErrTooLarge
+
 	file, err := os.OpenFile(filepath, os.O_RDONLY, 0644)
 
 	if err != nil {

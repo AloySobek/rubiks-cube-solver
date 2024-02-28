@@ -5,8 +5,8 @@ import (
 )
 
 type Database struct {
-	tables []map[uint64]int
-	goals  []map[uint64]bool
+	Tables []map[uint64]int
+	Goals  []map[uint64]bool
 }
 
 type node struct {
