@@ -102,7 +102,7 @@ func Create(c *Cube) *Cube {
 	}
 }
 
-func ApplyMoves(c *Cube, sequence []string) []string {
+func ApplyMoves(c *Cube, sequence []string) *Cube {
 	for _, v := range sequence {
 		if move, ok := G0[strings.ToUpper(v)]; ok {
 			move(c)
@@ -111,5 +111,5 @@ func ApplyMoves(c *Cube, sequence []string) []string {
 		}
 	}
 
-	return sequence
+	return c
 }
