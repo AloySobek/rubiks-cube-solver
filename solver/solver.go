@@ -1,11 +1,12 @@
 package solver
 
 import (
+	"fmt"
 	"github.com/AloySobek/Rubik/cube"
 	"math"
 )
 
-func Solve(c *cube.Cube, d Database) (*cube.Cube, string) {
+func Solve(c *cube.Cube, d Database, v bool) (*cube.Cube, string) {
 	s := node{c, ""}
 
 	for i := 0; i < 4; i += 1 {
@@ -18,6 +19,10 @@ func Solve(c *cube.Cube, d Database) (*cube.Cube, string) {
 
 			return false
 		})
+
+		if v {
+			fmt.Printf("Group G%d solution: %s\n", i, s.m)
+		}
 	}
 
 	return s.c, s.m
