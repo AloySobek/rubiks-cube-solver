@@ -6,6 +6,19 @@ import (
 	"math"
 )
 
+var descriptions = [4]string{
+	"All edges are correctly oriented(GOOD edges)",
+	"All corners are correctly oriented(GOOD corners) and edges FU, FD, BU, BD are in their slice",
+	"All squares are either their face color or the opposite",
+	"All squares are their face color only",
+}
+var groups = [4]string{
+	"<L, R, F, B, U, D>",
+	"<L, R, F, B, U2, D2>",
+	"<L, R, F2, B2, U2, D2>",
+	"<L2, R2, F2, B2, U2, D2>",
+}
+
 func Solve(c *cube.Cube, d Database, v bool) (*cube.Cube, string) {
 	s := node{c, ""}
 
@@ -21,7 +34,10 @@ func Solve(c *cube.Cube, d Database, v bool) (*cube.Cube, string) {
 		})
 
 		if v {
-			fmt.Printf("Group G%d solution: %s\n", i, s.m)
+			fmt.Printf("Solving for group G%d\n", i)
+			fmt.Printf("\t%s\n", descriptions[i])
+			fmt.Printf("Subgroup: \n\t%s\n", groups[i])
+			fmt.Printf("Solution: \n\t%s\n", s.m)
 		}
 	}
 
